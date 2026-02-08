@@ -20,24 +20,26 @@ Precium is a comprehensive price comparison application that combines:
 
 This project uses a **monorepo** structure with the following tech stack:
 
-- **Backend**: Node.js + TypeScript + NestJS
-- **Frontend Web**: React + TypeScript + Tailwind CSS
+- **Backend**: Golang 1.23+ with Fiber/Gin framework
+- **Frontend Web**: React + TypeScript + Vite + Tailwind CSS
 - **Mobile**: React Native + TypeScript
-- **Database**: PostgreSQL + PostGIS
-- **Cache**: Redis
-- **Monorepo Tool**: Turborepo
+- **Database**: PostgreSQL 17+ with PostGIS
+- **ORM**: Drizzle ORM
+- **Cache**: Redis 7+
+- **Monorepo Tool**: npm workspaces + Vite
 
 ## 📚 Documentation
 
 Comprehensive documentation is available in the `/docs` directory:
 
-1. **[Technology Stack Analysis](docs/01-TECHNOLOGY-STACK-ANALYSIS.md)** - Node.js vs Golang comparison
-2. **[Monorepo Strategy](docs/02-MONOREPO-VS-MULTIREPO-STRATEGY.md)** - Repository structure decisions
+1. **[Technology Stack Decision](docs/01-TECHNOLOGY-STACK-DECISION.md)** - Golang backend rationale
+2. **[Monorepo Strategy](docs/02-MONOREPO-VS-MULTIREPO-STRATEGY.md)** - Repository structure with npm workspaces
 3. **[System Architecture](docs/03-SYSTEM-ARCHITECTURE.md)** - Complete system design
 4. **[API Contracts](docs/04-API-CONTRACTS.md)** - REST API specifications
 5. **[Implementation Roadmap](docs/05-IMPLEMENTATION-ROADMAP.md)** - 6-iteration development plan
 6. **[Folder Structure & Best Practices](docs/06-FOLDER-STRUCTURE-AND-BEST-PRACTICES.md)** - Code organization
 7. **[CI/CD Strategy](docs/08-CI-CD-STRATEGY.md)** - Deployment pipeline
+8. **[API Communication Analysis](docs/10-API-COMMUNICATION-ANALYSIS.md)** - REST vs gRPC vs tRPC vs GraphQL
 
 ## 🚀 Quick Start (Coming Soon)
 
@@ -61,12 +63,12 @@ npm run dev
 ```
 precium/
 ├── apps/
-│   ├── backend/          # NestJS API
-│   ├── web/              # React web application
+│   ├── backend/          # Golang API with Fiber
+│   ├── web/              # React + Vite web application
 │   └── mobile/           # React Native mobile app
 ├── packages/
 │   ├── shared-types/     # Shared TypeScript types
-│   ├── validation/       # Validation schemas
+│   ├── validation/       # Validation schemas (Zod)
 │   ├── api-client/       # API client library
 │   ├── ui-components/    # Shared UI components
 │   └── utils/            # Utility functions
@@ -97,17 +99,32 @@ precium/
 
 ## 🛠️ Technology Decisions
 
-### Why Node.js?
-- Unified language across stack (TypeScript)
-- Rich ecosystem for rapid development
-- Easy code sharing between platforms
-- Fast time-to-market
+### Why Golang?
+- Exceptional performance for route optimization algorithms
+- Built-in concurrency with goroutines
+- Fast compilation and deployment
+- Strong typing and reliability
+- Excellent for microservices architecture
+- Lower resource consumption
 
-### Why Monorepo?
-- Simplified dependency management
-- Atomic cross-platform changes
-- Better code sharing
-- Unified CI/CD
+### Why npm Workspaces + Vite?
+- Native npm workspace support (no extra tooling)
+- Vite for ultra-fast frontend builds
+- Simpler setup and maintenance
+- Modern build toolchain
+- Better for mixed-language monorepos (Go + TypeScript)
+
+### Why Drizzle ORM?
+- Modern TypeScript-first ORM
+- Type-safe database queries
+- Lightweight and performant
+- Great migrations support
+- SQL-like syntax
+
+### Communication Protocol
+- **REST/JSON**: For all client-facing APIs (simple, universal, cacheable)
+- **gRPC**: For internal service-to-service communication (when needed)
+- See [API Communication Analysis](docs/10-API-COMMUNICATION-ANALYSIS.md) for detailed comparison
 
 ### Why React Native?
 - Code sharing with web application
@@ -134,14 +151,14 @@ This project is currently in the planning phase. Contribution guidelines will be
 
 ## 📄 License
 
-TBD
+MIT License - see [LICENSE](LICENSE) file for details
 
 ## 👥 Team
 
-- Project Lead: [To be assigned]
-- Backend Developer: [To be assigned]
-- Frontend Developer: [To be assigned]
-- Mobile Developer: [To be assigned]
+- Project Lead: @johnny4young
+- Backend Developer (Golang): [To be assigned]
+- Frontend Developer (React): [To be assigned]
+- Mobile Developer (React Native): [To be assigned]
 - DevOps Engineer: [To be assigned]
 
 ## 📞 Contact
