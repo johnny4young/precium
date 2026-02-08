@@ -29,36 +29,47 @@ To create the most user-friendly and accurate price comparison platform that sav
 
 | Component | Technology | Rationale |
 |-----------|-----------|-----------|
-| **Backend** | Node.js + TypeScript + NestJS | Unified language, rapid development, rich ecosystem |
-| **Web Frontend** | React + TypeScript | Industry standard, component reusability |
-| **Mobile** | React Native + TypeScript | Code sharing, single team for all platforms |
-| **Database** | PostgreSQL + PostGIS | Proven reliability, excellent GIS support |
-| **Cache** | Redis | Performance optimization |
-| **Repository** | Monorepo with Turborepo | Code sharing, atomic changes |
+| **Backend** | Golang 1.23+ with Fiber | Exceptional performance, native concurrency, microservices-ready |
+| **Web Frontend** | React + TypeScript + Vite | Industry standard, ultra-fast builds |
+| **Mobile** | React Native + TypeScript | Code sharing, cross-platform |
+| **Database** | PostgreSQL 17 + PostGIS 3.4 | Latest version, excellent GIS support |
+| **ORM** | Drizzle ORM | Modern, type-safe, lightweight |
+| **Cache** | Redis 7+ | Performance optimization |
+| **Repository** | Monorepo with npm workspaces | Native, simple, no extra tooling |
+| **Build Tool** | Vite 6+ | Lightning-fast frontend builds |
 | **CI/CD** | GitHub Actions | Native integration, flexible |
 | **Hosting** | Cloud (AWS/GCP/Azure) | Scalability, managed services |
 
 ### Key Technical Decisions
 
-1. **Node.js over Golang**: Faster development, unified stack, easier team collaboration
-   - Hybrid approach possible: Golang microservices for performance-critical features
+1. **Golang for Backend**: Exceptional performance (10-100x faster for algorithms), native concurrency with goroutines, perfect for microservices, lower costs
+   - Single binary deployment, no dependency hell
+   - Built-in concurrency for handling 50K+ concurrent users
    
-2. **Monorepo over Multi-repo**: Better code sharing, simplified dependencies, atomic changes
-   - All apps and packages in one repository
+2. **npm workspaces + Vite over Turborepo**: Native npm feature, simpler for mixed-language monorepos (Go + TypeScript), Vite provides ultra-fast builds
+   - No extra dependencies or complex configuration
+   - Sufficient for our team size and requirements
    
-3. **React Native over Native**: Faster development, code sharing with web, smaller team
+3. **Drizzle ORM over Prisma/TypeORM**: Modern TypeScript-first ORM, lightweight, SQL-like syntax, better performance
+   - Type-safe database queries without heavy runtime
+   
+4. **REST over tRPC/GraphQL**: Universal compatibility, simple debugging, HTTP caching
+   - tRPC requires TypeScript backend (not compatible with Golang)
+   - gRPC reserved for internal service-to-service communication
+   
+5. **React Native over Native**: Faster development, code sharing with web, smaller team
 
 ## Project Structure
 
 ```
 precium/
 ├── apps/
-│   ├── backend/          # NestJS API (Node.js + TypeScript)
-│   ├── web/              # React web application
+│   ├── backend/          # Golang API with Fiber framework
+│   ├── web/              # React + Vite web application
 │   └── mobile/           # React Native (iOS + Android)
 ├── packages/
-│   ├── shared-types/     # Shared TypeScript definitions
-│   ├── validation/       # Shared validation schemas
+│   ├── shared-types/     # TypeScript type definitions
+│   ├── validation/       # Validation schemas (Zod)
 │   ├── api-client/       # API client library
 │   ├── ui-components/    # Shared UI components
 │   └── utils/            # Utility functions
@@ -82,30 +93,30 @@ precium/
 ### Iteration 1: Foundation & Authentication (Weeks 1-4)
 
 **Week 1**: Project Setup
-- Initialize monorepo with Turborepo
+- Initialize monorepo with npm workspaces
 - Set up Docker Compose for local development
-- Configure PostgreSQL + PostGIS + Redis
+- Configure PostgreSQL 17 + PostGIS + Redis 7
 - Create initial database schema
-- Set up CI/CD pipeline
+- Set up CI/CD pipeline with GitHub Actions
 
 **Week 2**: Backend Foundation
-- Set up NestJS application
-- Configure TypeORM/Prisma
+- Set up Golang + Fiber application
+- Configure Drizzle ORM for database
 - Implement database migrations
 - Set up logging and monitoring
 - Create health check endpoints
 
 **Week 3**: Authentication System
-- Implement JWT authentication
-- Set up Passport.js
+- Implement JWT authentication in Golang
+- Use modern OAuth libraries (go-oauth2)
 - Integrate Google OAuth
-- Add email/password registration
-- Implement refresh tokens
+- Add email/password registration with bcrypt
+- Implement refresh token mechanism
 
 **Week 4**: Frontend Foundation
-- Set up React web app (Vite + Tailwind)
+- Set up React web app with Vite 6
 - Create authentication pages
-- Set up React Native mobile app (Expo)
+- Set up React Native mobile app
 - Implement OAuth flows
 - Create protected routes
 
