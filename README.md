@@ -20,13 +20,14 @@ Precium is a comprehensive price comparison application that combines:
 
 This project uses a **monorepo** structure with the following tech stack:
 
-- **Backend**: Golang 1.23+ with Fiber/Gin framework
-- **Frontend Web**: React + TypeScript + Vite + Tailwind CSS
-- **Mobile**: React Native + TypeScript
-- **Database**: PostgreSQL 17+ with PostGIS
-- **ORM**: Drizzle ORM
+- **Backend**: Golang 1.23+ with Fiber framework (high-performance)
+- **Frontend Web**: React 18+ + TypeScript 5.7+ + Vite 6+ + Tailwind CSS
+- **Mobile**: React Native 0.76+ + TypeScript 5.7+
+- **Database**: PostgreSQL 17+ with PostGIS 3.4, pg_trgm (fuzzy search), unaccent (Spanish)
+- **Query Builder**: SQLC (type-safe Go code from SQL)
 - **Cache**: Redis 7+
 - **Monorepo Tool**: npm workspaces + Vite
+- **Reverse Proxy**: Traefik (no complex API gateway initially)
 
 ## 📚 Documentation
 
@@ -114,12 +115,13 @@ precium/
 - Modern build toolchain
 - Better for mixed-language monorepos (Go + TypeScript)
 
-### Why Drizzle ORM?
-- Modern TypeScript-first ORM
-- Type-safe database queries
-- Lightweight and performant
-- Great migrations support
-- SQL-like syntax
+### Why SQLC?
+- Type-safe Go code generated from SQL
+- Write pure SQL, get type-safe Go code
+- Compile-time query validation
+- No ORM overhead - just SQL
+- Perfect for Golang projects
+- Easy migrations with golang-migrate
 
 ### Communication Protocol
 - **REST/JSON**: For all client-facing APIs (simple, universal, cacheable)

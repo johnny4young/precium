@@ -13,10 +13,13 @@ To create the most user-friendly and accurate price comparison platform that sav
 ### Core Functionality
 1. **Location-Based Product Search** - Find products in nearby stores using GPS
 2. **Smart Price Comparison** - Real-time price analysis across multiple retailers
-3. **Route Optimization** - AI-powered shopping route planning (minimum distance or best prices)
-4. **Receipt Scanning** - OCR technology for easy price contributions
-5. **Shopping Lists** - Organized list management with cost estimation
-6. **Promotions** - Real-time deals and special offers
+3. **Advanced Fuzzy Search** - Typo-tolerant search supporting Spanish language variations (huevos, huebos, uevos)
+4. **Intelligent Autocomplete** - Search history + popular searches + contextual suggestions
+5. **Route Optimization** - AI-powered shopping route planning (minimum distance or best prices)
+6. **Receipt Scanning** - OCR technology for easy price contributions
+7. **Shopping Lists** - Organized list management with cost estimation
+8. **Promotions** - Real-time deals and special offers
+9. **Monetization Features** - Freemium model with subscriptions, ads, and store promotions
 
 ### Platform Support
 - **Web Application** - Desktop and mobile browsers
@@ -32,11 +35,13 @@ To create the most user-friendly and accurate price comparison platform that sav
 | **Backend** | Golang 1.23+ with Fiber | Exceptional performance, native concurrency, microservices-ready |
 | **Web Frontend** | React + TypeScript + Vite | Industry standard, ultra-fast builds |
 | **Mobile** | React Native + TypeScript | Code sharing, cross-platform |
-| **Database** | PostgreSQL 17 + PostGIS 3.4 | Latest version, excellent GIS support |
-| **ORM** | Drizzle ORM | Modern, type-safe, lightweight |
+| **Database** | PostgreSQL 17 + PostGIS 3.4 + Extensions | Latest version, GIS support, pg_trgm for fuzzy search, unaccent for Spanish |
+| **Query Builder** | SQLC | Type-safe Go code from SQL, perfect for Golang |
 | **Cache** | Redis 7+ | Performance optimization |
 | **Repository** | Monorepo with npm workspaces | Native, simple, no extra tooling |
 | **Build Tool** | Vite 6+ | Lightning-fast frontend builds |
+| **API Gateway** | Traefik (reverse proxy) | Simple, lightweight - no complex gateway needed initially |
+| **Authentication** | Custom Golang OAuth2 + JWT | Lightweight, performant, full control |
 | **CI/CD** | GitHub Actions | Native integration, flexible |
 | **Hosting** | Cloud (AWS/GCP/Azure) | Scalability, managed services |
 
@@ -46,18 +51,36 @@ To create the most user-friendly and accurate price comparison platform that sav
    - Single binary deployment, no dependency hell
    - Built-in concurrency for handling 50K+ concurrent users
    
-2. **npm workspaces + Vite over Turborepo**: Native npm feature, simpler for mixed-language monorepos (Go + TypeScript), Vite provides ultra-fast builds
+2. **SQLC over ORMs**: Type-safe Go code generated from SQL, no ORM overhead, compile-time query validation
+   - Write pure SQL, get type-safe Go code
+   - Perfect for Golang projects
+   
+3. **Fuzzy Search with pg_trgm**: PostgreSQL's trigram extension for typo-tolerant search
+   - Handles Spanish language variations and typos
+   - Fast with GIN indexes, no external dependencies
+   - Implemented in Iteration 1
+   
+4. **Simple Architecture (No API Gateway Initially)**: Direct backend with Fiber middleware
+   - Traefik as lightweight reverse proxy
+   - Add full API Gateway (Kong) only if needed later
+   - Reduces complexity for MVP
+   
+5. **Custom Authentication (Not Keycloak)**: Golang OAuth2 + JWT for lightweight auth
+   - No JVM overhead, faster performance
+   - Full control over auth flow
+   - Can migrate to Keycloak later if enterprise features needed
+   
+6. **npm workspaces + Vite over Turborepo**: Native npm feature, simpler for mixed-language monorepos (Go + TypeScript), Vite provides ultra-fast builds
    - No extra dependencies or complex configuration
    - Sufficient for our team size and requirements
    
-3. **Drizzle ORM over Prisma/TypeORM**: Modern TypeScript-first ORM, lightweight, SQL-like syntax, better performance
-   - Type-safe database queries without heavy runtime
-   
-4. **REST over tRPC/GraphQL**: Universal compatibility, simple debugging, HTTP caching
+7. **REST over tRPC/GraphQL**: Universal compatibility, simple debugging, HTTP caching
    - tRPC requires TypeScript backend (not compatible with Golang)
    - gRPC reserved for internal service-to-service communication
    
-5. **React Native over Native**: Faster development, code sharing with web, smaller team
+8. **Freemium Monetization Model**: Free tier with ads, premium subscriptions, store promotions
+   - Multiple revenue streams
+   - Scalable business model
 
 ## Project Structure
 
@@ -65,15 +88,25 @@ To create the most user-friendly and accurate price comparison platform that sav
 precium/
 ├── apps/
 │   ├── backend/          # Golang API with Fiber framework
+│   │   ├── cmd/api/      # Main application entry
+│   │   ├── internal/     # Internal packages
+│   │   │   ├── handlers/ # HTTP handlers
+│   │   │   ├── services/ # Business logic
+│   │   │   ├── models/   # Data models
+│   │   │   └── db/       # SQLC generated code
+│   │   ├── migrations/   # SQL migrations
+│   │   ├── queries/      # SQL queries for SQLC
+│   │   └── go.mod
 │   ├── web/              # React + Vite web application
 │   └── mobile/           # React Native (iOS + Android)
 ├── packages/
-│   ├── shared-types/     # TypeScript type definitions
+│   ├── shared-types/     # TypeScript type definitions (generated from OpenAPI)
 │   ├── validation/       # Validation schemas (Zod)
 │   ├── api-client/       # API client library
 │   ├── ui-components/    # Shared UI components
 │   └── utils/            # Utility functions
 ├── docs/                 # Comprehensive documentation
+│   ├── 11-ADDITIONAL-REQUIREMENTS-ANALYSIS.md  # New requirements
 └── scripts/              # Build and deployment scripts
 ```
 
@@ -96,29 +129,40 @@ precium/
 - Initialize monorepo with npm workspaces
 - Set up Docker Compose for local development
 - Configure PostgreSQL 17 + PostGIS + Redis 7
-- Create initial database schema
+- Install PostgreSQL extensions: pg_trgm, unaccent, postgis
+- Create initial database schema with SQLC
 - Set up CI/CD pipeline with GitHub Actions
+- Configure Traefik as reverse proxy
 
-**Week 2**: Backend Foundation
-- Set up Golang + Fiber application
-- Configure Drizzle ORM for database
-- Implement database migrations
+**Week 2**: Backend Foundation & Fuzzy Search ⭐ NEW
+- Set up Golang + Fiber application structure
+- Configure SQLC for type-safe database queries
+- Implement database migrations with golang-migrate
+- Create core tables: users, products, stores, prices
+- **Implement fuzzy search with pg_trgm extension**
+- **Add unaccent support for Spanish language**
 - Set up logging and monitoring
 - Create health check endpoints
+- Test fuzzy search: "huebos" → "huevos", "uevos" → "huevos"
 
 **Week 3**: Authentication System
 - Implement JWT authentication in Golang
-- Use modern OAuth libraries (go-oauth2)
-- Integrate Google OAuth
+- Use golang-jwt library for token generation
+- Integrate Google OAuth2 (golang.org/x/oauth2)
 - Add email/password registration with bcrypt
 - Implement refresh token mechanism
+- **Add user_search_history table for autocomplete**
+- Create auth middleware for protected routes
 
-**Week 4**: Frontend Foundation
+**Week 4**: Frontend Foundation & Search
 - Set up React web app with Vite 6
 - Create authentication pages
 - Set up React Native mobile app
 - Implement OAuth flows
 - Create protected routes
+- **Implement search interface with fuzzy matching**
+- **Add autocomplete component with user history**
+- Test search with various typos and accents
 
 **Deliverable**: Working authentication system across all platforms
 
@@ -208,8 +252,11 @@ GET    /auth/google
 POST   /auth/refresh
 GET    /auth/me
 
-Search
-GET    /search/products
+Search & Autocomplete
+GET    /search/products?q=huevos&lat=40.7&lon=-74.0
+GET    /search/autocomplete?q=huev&userId=:userId
+GET    /search/history?userId=:userId
+DELETE /search/history/:userId
 GET    /search/stores
 GET    /search/products/:id/stores
 
@@ -227,6 +274,26 @@ Prices
 GET    /prices/product/:productId/store/:storeId
 GET    /prices/product/:productId/history
 POST   /prices
+
+Subscriptions & Monetization
+GET    /subscriptions/plans
+GET    /subscriptions/user/:userId
+POST   /subscriptions/subscribe
+POST   /subscriptions/cancel
+POST   /subscriptions/upgrade
+POST   /payments/create-intent
+POST   /payments/webhook
+GET    /payments/history
+
+Advertisements (Store Owners)
+POST   /ads/create
+GET    /ads/:id
+PUT    /ads/:id
+DELETE /ads/:id
+GET    /ads/analytics/:id
+GET    /ads/display?location=lat,lon&type=banner
+POST   /ads/:id/impression
+POST   /ads/:id/click
 
 Routes
 POST   /routes/optimize
@@ -349,7 +416,7 @@ POST   /ocr/jobs/:id/review
 - User Acquisition Cost
 - Customer Lifetime Value
 - User Satisfaction Score
-- Net Promoter Score (NPS)
+- Net Promoter Score (NPS): A metric measuring customer loyalty on a scale from -100 to +100, based on asking users "How likely are you to recommend this product?" Scores above 50 are considered excellent.
 
 ## Budget Estimates
 
