@@ -8,10 +8,10 @@ This document analyzes whether the Precium project should be structured as a mon
 
 The Precium application consists of:
 
-1. **Backend API** (Node.js/TypeScript)
-2. **Web Application** (React/TypeScript)
-3. **Mobile Applications** (React Native/TypeScript)
-4. **Shared Libraries** (TypeScript)
+1. **Backend API** (Golang with Fiber framework)
+2. **Web Application** (React + TypeScript + Vite)
+3. **Mobile Applications** (React Native + TypeScript)
+4. **Shared Libraries** (TypeScript for frontend, Go packages for backend)
 
 ## Monorepo Strategy
 
@@ -22,10 +22,11 @@ A monorepo (monolithic repository) is a single repository containing multiple pr
 ### Pros
 
 ✅ **Code Sharing**
-- Easy to share TypeScript types, validation schemas, and utilities
-- Single source of truth for data models
+- Easy to share TypeScript types between web and mobile
+- Single source of truth for API contracts
 - Shared components between web and mobile
-- Consistent API contracts across all platforms
+- Consistent validation schemas (Zod for frontend)
+- Go packages can be shared between backend services
 
 ✅ **Simplified Dependency Management**
 - Single `package.json` or workspace configuration
@@ -65,9 +66,10 @@ A monorepo (monolithic repository) is a single repository containing multiple pr
 - Git operations can be slower
 
 ❌ **Complex Build System**
-- Need sophisticated build orchestration (Nx, Turborepo, Lerna)
-- CI/CD can be complex to configure
-- Requires careful caching strategies
+- Mixed languages (Go + TypeScript) require different build tools
+- Frontend uses npm + Vite, backend uses Go toolchain
+- Need to coordinate builds across different ecosystems
+- npm workspaces + Vite simplify this compared to Turborepo
 
 ❌ **All-or-Nothing Access**
 - Can't restrict access to specific parts easily
@@ -164,15 +166,16 @@ precium-shared/        (separate repo - npm package)
 
 ## Recommendation for Precium
 
-### 🎯 **Recommended: Monorepo with Workspaces**
+### 🎯 **Recommended: Monorepo with npm Workspaces**
 
 **Primary Reasons:**
 
-1. **TypeScript Everywhere**: Maximum benefit from code sharing
+1. **Mixed Languages**: Golang backend + TypeScript frontend work well together
 2. **Small Team**: Easier coordination in a monorepo
 3. **Rapid Development**: Faster iterations for MVP
-4. **React/React Native**: Share components and logic
-5. **API Contracts**: Types shared between frontend and backend
+4. **React/React Native**: Share components and logic between web and mobile
+5. **API Contracts**: OpenAPI spec generation ensures type safety
+6. **Simplicity**: Native npm workspaces + Vite (no complex build orchestration)
 
 ### Recommended Structure
 
@@ -180,77 +183,101 @@ precium-shared/        (separate repo - npm package)
 precium/                          (monorepo root)
 ├── .github/                      (CI/CD workflows)
 ├── apps/
-│   ├── backend/                  (Node.js API)
-│   │   ├── src/
-│   │   ├── tests/
-│   │   ├── package.json
-│   │   └── tsconfig.json
-│   ├── web/                      (React Web App)
+│   ├── backend/                  (Golang API with Fiber)
+│   │   ├── cmd/
+│   │   │   └── api/
+│   │   │       └── main.go
+│   │   ├── internal/
+│   │   │   ├── handlers/
+│   │   │   ├── services/
+│   │   │   └── models/
+│   │   ├── go.mod
+│   │   ├── go.sum
+│   │   └── Dockerfile
+│   ├── web/                      (React + Vite Web App)
 │   │   ├── src/
 │   │   ├── public/
 │   │   ├── package.json
-│   │   └── tsconfig.json
+│   │   ├── tsconfig.json
+│   │   └── vite.config.ts
 │   └── mobile/                   (React Native)
 │       ├── src/
 │       ├── ios/
 │       ├── android/
 │       ├── package.json
 │       └── tsconfig.json
-├── packages/                     (shared libraries)
-│   ├── shared-types/             (TypeScript types)
-│   ├── shared-utils/             (utility functions)
+├── packages/                     (shared TypeScript libraries)
+│   ├── shared-types/             (API types from OpenAPI)
+│   ├── validation/               (Zod validation schemas)
 │   ├── ui-components/            (shared React components)
 │   ├── api-client/               (API client library)
-│   └── validation/               (validation schemas)
+│   └── utils/                    (utility functions)
 ├── docs/                         (documentation)
 ├── scripts/                      (build/deploy scripts)
-├── package.json                  (root workspace config)
-├── turbo.json                    (Turborepo config)
+├── package.json                  (npm workspace config)
 ├── tsconfig.base.json            (base TypeScript config)
 └── README.md
 ```
 
 ### Recommended Tooling
 
-**Primary: Turborepo**
+**Primary: npm Workspaces + Vite**
 
 ```json
 {
   "name": "precium",
   "private": true,
   "workspaces": [
-    "apps/*",
+    "apps/web",
+    "apps/mobile",
     "packages/*"
   ],
   "scripts": {
-    "dev": "turbo run dev",
-    "build": "turbo run build",
-    "test": "turbo run test",
-    "lint": "turbo run lint"
-  },
-  "devDependencies": {
-    "turbo": "^1.10.0"
+    "dev": "npm run dev --workspace=apps/web",
+    "dev:backend": "cd apps/backend && air",
+    "build": "npm run build --workspaces",
+    "test": "npm run test --workspaces"
   }
 }
 ```
 
-**Why Turborepo?**
-- Fastest build system for monorepos
-- Intelligent caching (local and remote)
-- Parallel task execution
-- Simple configuration
-- Great for TypeScript projects
-- Active development and community
+**Why npm Workspaces + Vite?**
+- Native npm feature (no extra dependencies)
+- Simple configuration for mixed-language monorepo
+- Vite provides ultra-fast frontend builds with HMR
+- Go has its own excellent toolchain
+- Less complexity than Turborepo/Nx
+- Sufficient for small-medium teams
+- Better suited when backend is different language
 
-**Alternative: Nx**
-- More features and generators
-- Better for large teams
-- Steeper learning curve
-- More opinionated
+**Backend Build (Golang):**
+```bash
+# Development with hot reload
+cd apps/backend && air
+
+# Production build
+cd apps/backend && go build -o bin/api ./cmd/api
+```
+
+**Frontend Build (Vite):**
+```bash
+# Development
+npm run dev --workspace=apps/web
+
+# Production
+npm run build --workspace=apps/web
+```
 
 ### Benefits for Precium Specifically
 
-1. **Shared Data Models**
+1. **Type Generation from API**
+```bash
+# Generate TypeScript types from OpenAPI spec
+cd apps/backend && swag init
+npx openapi-typescript ./docs/swagger.json -o ./packages/shared-types/src/api.ts
+```
+
+2. **Shared Validation**
 ```typescript
 // packages/shared-types/src/index.ts
 export interface Product {
