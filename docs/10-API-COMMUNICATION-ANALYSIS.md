@@ -370,6 +370,12 @@ type Product struct {
     Name  string  `json:"name" validate:"required,min=3,max=100"`
     Price float64 `json:"price" validate:"required,gt=0"`
 }
+
+// Usage with validator
+import "github.com/go-playground/validator/v10"
+
+validate := validator.New()
+err := validate.Struct(product)
 ```
 
 **TypeScript (using Zod):**
@@ -491,16 +497,19 @@ app.Use(cors.New(cors.Config{
 
 ## Monitoring & Debugging
 
-### REST Advantages for Debugging:
+### Backend Advantages for Debugging:
 1. **Browser DevTools**: Inspect requests/responses easily
 2. **Curl Testing**: Simple command-line testing
 3. **Postman/Insomnia**: Rich GUI tools
 4. **Logging**: Easy to log JSON payloads
 
 ```bash
-# Easy debugging
+# Easy debugging with REST
 curl -X GET https://api.precium.com/api/v1/products \
-  -H "Authorization: ******
+  -H "Authorization: Bearer <token>"
+
+# Test Golang backend locally
+curl http://localhost:3000/api/v1/health
 ```
 
 ### gRPC Debugging (Internal Services):

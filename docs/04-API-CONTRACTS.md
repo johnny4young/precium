@@ -13,6 +13,7 @@ This document defines the REST API contracts, request/response schemas, and data
 5. **Error Handling**: Consistent error format
 6. **Authentication**: JWT Bearer tokens
 7. **Rate Limiting**: Per endpoint and user
+8. **Implementation**: Golang + Fiber framework
 
 ## Base URL
 
@@ -23,49 +24,51 @@ Development:  http://localhost:3000/api/v1
 
 ## Common Types
 
-### Coordinates
-```typescript
-interface Coordinates {
-  latitude: number;   // -90 to 90
-  longitude: number;  // -180 to 180
+### Common Types
+
+```go
+// Coordinates represents geographic coordinates
+type Coordinates struct {
+    Latitude  float64 `json:"latitude"`  // -90 to 90
+    Longitude float64 `json:"longitude"` // -180 to 180
+}
+
+// PaginationQuery for request parameters
+type PaginationQuery struct {
+    Page   int    `json:"page,omitempty" query:"page"`     // Default: 1
+    Limit  int    `json:"limit,omitempty" query:"limit"`   // Default: 20, Max: 100
+    Cursor string `json:"cursor,omitempty" query:"cursor"` // For cursor-based pagination
+}
+
+// PaginationResponse for paginated responses
+type PaginationResponse struct {
+    Page       int    `json:"page"`
+    Limit      int    `json:"limit"`
+    Total      int    `json:"total"`
+    HasMore    bool   `json:"hasMore"`
+    NextCursor string `json:"nextCursor,omitempty"`
+}
+
+// PaginatedResponse generic type
+type PaginatedResponse[T any] struct {
+    Data       []T                `json:"data"`
+    Pagination PaginationResponse `json:"pagination"`
+}
+
+// ErrorResponse standard error response
+type ErrorResponse struct {
+    Error ErrorDetail `json:"error"`
+}
+
+type ErrorDetail struct {
+    Code      string      `json:"code"`      // e.g., "VALIDATION_ERROR"
+    Message   string      `json:"message"`   // Human-readable message
+    Details   interface{} `json:"details,omitempty"`
+    Timestamp string      `json:"timestamp"` // ISO 8601
+    Path      string      `json:"path"`      // API endpoint
+    RequestID string      `json:"requestId"` // For tracking
 }
 ```
-
-### Pagination Request
-```typescript
-interface PaginationQuery {
-  page?: number;      // Default: 1
-  limit?: number;     // Default: 20, Max: 100
-  cursor?: string;    // For cursor-based pagination
-}
-```
-
-### Pagination Response
-```typescript
-interface PaginatedResponse<T> {
-  data: T[];
-  pagination: {
-    page: number;
-    limit: number;
-    total: number;
-    hasMore: boolean;
-    nextCursor?: string;
-  };
-}
-```
-
-### Error Response
-```typescript
-interface ErrorResponse {
-  error: {
-    code: string;           // e.g., "VALIDATION_ERROR"
-    message: string;        // Human-readable message
-    details?: any;          // Additional details
-    timestamp: string;      // ISO 8601
-    path: string;          // API endpoint
-    requestId: string;     // For tracking
-  };
-}
 
 // Example:
 {
@@ -896,141 +899,168 @@ Get promotion details.
 ## Data Models
 
 ### User
-```typescript
-interface User {
-  id: string;              // UUID
-  email: string;
-  name: string;
-  avatarUrl?: string;
-  provider: 'google' | 'apple' | 'github' | 'email';
-  providerId?: string;
-  createdAt: string;       // ISO 8601
-  updatedAt: string;
-  lastLogin?: string;
+```go
+type User struct {
+    ID         string    `json:"id" db:"id"`                      // UUID
+    Email      string    `json:"email" db:"email"`
+    Name       string    `json:"name" db:"name"`
+    AvatarURL  *string   `json:"avatarUrl,omitempty" db:"avatar_url"`
+    Provider   string    `json:"provider" db:"provider"`          // 'google', 'apple', 'github', 'email'
+    ProviderID *string   `json:"providerId,omitempty" db:"provider_id"`
+    CreatedAt  time.Time `json:"createdAt" db:"created_at"`       // ISO 8601
+    UpdatedAt  time.Time `json:"updatedAt" db:"updated_at"`
+    LastLogin  *time.Time `json:"lastLogin,omitempty" db:"last_login"`
 }
 ```
 
 ### Store
-```typescript
-interface Store {
-  id: string;
-  name: string;
-  chainId?: string;
-  chain?: StoreChain;
-  address: string;
-  city: string;
-  country: string;
-  postalCode?: string;
-  latitude: number;
-  longitude: number;
-  phone?: string;
-  operatingHours?: {
-    [day: string]: {
-      open: string;
-      close: string;
-      closed?: boolean;
-    };
-  };
-  amenities?: string[];
-  createdAt: string;
-  updatedAt: string;
+```go
+type OperatingHours map[string]DayHours
+
+type DayHours struct {
+    Open   string `json:"open"`            // "09:00"
+    Close  string `json:"close"`           // "21:00"
+    Closed bool   `json:"closed,omitempty"`
+}
+
+type Store struct {
+    ID             string          `json:"id" db:"id"`
+    Name           string          `json:"name" db:"name"`
+    ChainID        *string         `json:"chainId,omitempty" db:"chain_id"`
+    Chain          *StoreChain     `json:"chain,omitempty"`
+    Address        string          `json:"address" db:"address"`
+    City           string          `json:"city" db:"city"`
+    Country        string          `json:"country" db:"country"`
+    PostalCode     *string         `json:"postalCode,omitempty" db:"postal_code"`
+    Latitude       float64         `json:"latitude" db:"latitude"`
+    Longitude      float64         `json:"longitude" db:"longitude"`
+    Phone          *string         `json:"phone,omitempty" db:"phone"`
+    OperatingHours *OperatingHours `json:"operatingHours,omitempty" db:"operating_hours"`
+    Amenities      []string        `json:"amenities,omitempty" db:"amenities"`
+    CreatedAt      time.Time       `json:"createdAt" db:"created_at"`
+    UpdatedAt      time.Time       `json:"updatedAt" db:"updated_at"`
 }
 ```
 
 ### Product
-```typescript
-interface Product {
-  id: string;
-  name: string;
-  description?: string;
-  categoryId: string;
-  category?: Category;
-  brand?: string;
-  barcode?: string;
-  imageUrl?: string;
-  unit: string;          // 'kg', 'liter', 'unit', etc.
-  createdAt: string;
-  updatedAt: string;
+```go
+type Product struct {
+    ID          string    `json:"id" db:"id"`
+    Name        string    `json:"name" db:"name"`
+    Description *string   `json:"description,omitempty" db:"description"`
+    CategoryID  string    `json:"categoryId" db:"category_id"`
+    Category    *Category `json:"category,omitempty"`
+    Brand       *string   `json:"brand,omitempty" db:"brand"`
+    Barcode     *string   `json:"barcode,omitempty" db:"barcode"`
+    ImageURL    *string   `json:"imageUrl,omitempty" db:"image_url"`
+    Unit        string    `json:"unit" db:"unit"` // 'kg', 'liter', 'unit', etc.
+    CreatedAt   time.Time `json:"createdAt" db:"created_at"`
+    UpdatedAt   time.Time `json:"updatedAt" db:"updated_at"`
 }
 ```
 
 ### Price
-```typescript
-interface Price {
-  id: string;
-  productId: string;
-  product?: Product;
-  storeId: string;
-  store?: Store;
-  price: number;
-  currency: string;
-  stockStatus?: 'in_stock' | 'low_stock' | 'out_of_stock';
-  validFrom: string;
-  validUntil?: string;
-  source: 'user' | 'store' | 'ocr' | 'scraper';
-  verified: boolean;
-  createdBy?: string;
-  createdAt: string;
+```go
+type StockStatus string
+
+const (
+    InStock    StockStatus = "in_stock"
+    LowStock   StockStatus = "low_stock"
+    OutOfStock StockStatus = "out_of_stock"
+)
+
+type PriceSource string
+
+const (
+    UserSource    PriceSource = "user"
+    StoreSource   PriceSource = "store"
+    OCRSource     PriceSource = "ocr"
+    ScraperSource PriceSource = "scraper"
+)
+
+type Price struct {
+    ID          string       `json:"id" db:"id"`
+    ProductID   string       `json:"productId" db:"product_id"`
+    Product     *Product     `json:"product,omitempty"`
+    StoreID     string       `json:"storeId" db:"store_id"`
+    Store       *Store       `json:"store,omitempty"`
+    Price       float64      `json:"price" db:"price"`
+    Currency    string       `json:"currency" db:"currency"`
+    StockStatus *StockStatus `json:"stockStatus,omitempty" db:"stock_status"`
+    ValidFrom   time.Time    `json:"validFrom" db:"valid_from"`
+    ValidUntil  *time.Time   `json:"validUntil,omitempty" db:"valid_until"`
+    Source      PriceSource  `json:"source" db:"source"`
+    Verified    bool         `json:"verified" db:"verified"`
+    CreatedBy   *string      `json:"createdBy,omitempty" db:"created_by"`
+    CreatedAt   time.Time    `json:"createdAt" db:"created_at"`
 }
 ```
 
 ### Promotion
-```typescript
-interface Promotion {
-  id: string;
-  productId?: string;
-  product?: Product;
-  storeId: string;
-  store?: Store;
-  title: string;
-  description?: string;
-  discountType: 'percentage' | 'fixed' | 'buy_x_get_y';
-  discountValue: number;
-  originalPrice?: number;
-  promotionPrice?: number;
-  startDate: string;
-  endDate: string;
-  conditions?: any;      // JSON conditions
-  createdAt: string;
+```go
+type DiscountType string
+
+const (
+    PercentageDiscount DiscountType = "percentage"
+    FixedDiscount      DiscountType = "fixed"
+    BuyXGetY           DiscountType = "buy_x_get_y"
+)
+
+type Promotion struct {
+    ID             string        `json:"id" db:"id"`
+    ProductID      *string       `json:"productId,omitempty" db:"product_id"`
+    Product        *Product      `json:"product,omitempty"`
+    StoreID        string        `json:"storeId" db:"store_id"`
+    Store          *Store        `json:"store,omitempty"`
+    Title          string        `json:"title" db:"title"`
+    Description    *string       `json:"description,omitempty" db:"description"`
+    DiscountType   DiscountType  `json:"discountType" db:"discount_type"`
+    DiscountValue  float64       `json:"discountValue" db:"discount_value"`
+    OriginalPrice  *float64      `json:"originalPrice,omitempty" db:"original_price"`
+    PromotionPrice *float64      `json:"promotionPrice,omitempty" db:"promotion_price"`
+    StartDate      time.Time     `json:"startDate" db:"start_date"`
+    EndDate        time.Time     `json:"endDate" db:"end_date"`
+    Conditions     interface{}   `json:"conditions,omitempty" db:"conditions"` // JSON
+    CreatedAt      time.Time     `json:"createdAt" db:"created_at"`
 }
 ```
 
 ### ShoppingList
-```typescript
-interface ShoppingList {
-  id: string;
-  userId: string;
-  name: string;
-  createdAt: string;
-  updatedAt: string;
+```go
+type ShoppingList struct {
+    ID        string    `json:"id" db:"id"`
+    UserID    string    `json:"userId" db:"user_id"`
+    Name      string    `json:"name" db:"name"`
+    CreatedAt time.Time `json:"createdAt" db:"created_at"`
+    UpdatedAt time.Time `json:"updatedAt" db:"updated_at"`
 }
 ```
 
 ### ShoppingListItem
-```typescript
-interface ShoppingListItem {
-  id: string;
-  listId: string;
-  productId?: string;
-  product?: Product;
-  productName?: string;  // If product not in DB
-  quantity: number;
-  unit: string;
-  checked: boolean;
-  createdAt: string;
+```go
+type ShoppingListItem struct {
+    ID          string    `json:"id" db:"id"`
+    ListID      string    `json:"listId" db:"list_id"`
+    ProductID   *string   `json:"productId,omitempty" db:"product_id"`
+    Product     *Product  `json:"product,omitempty"`
+    ProductName *string   `json:"productName,omitempty" db:"product_name"` // If product not in DB
+    Quantity    float64   `json:"quantity" db:"quantity"`
+    Unit        string    `json:"unit" db:"unit"`
+    Checked     bool      `json:"checked" db:"checked"`
+    CreatedAt   time.Time `json:"createdAt" db:"created_at"`
 }
 ```
 
 ### Category
-```typescript
-interface Category {
-  id: string;
-  name: string;
-  slug: string;
-  parentId?: string;
-  parent?: Category;
-  imageUrl?: string;
-  createdAt: string;
+```go
+type Category struct {
+    ID        string    `json:"id" db:"id"`
+    Name      string    `json:"name" db:"name"`
+    Slug      string    `json:"slug" db:"slug"`
+    ParentID  *string   `json:"parentId,omitempty" db:"parent_id"`
+    Parent    *Category `json:"parent,omitempty"`
+    ImageURL  *string   `json:"imageUrl,omitempty" db:"image_url"`
+    CreatedAt time.Time `json:"createdAt" db:"created_at"`
 }
 ```
 
@@ -1053,32 +1083,44 @@ interface Category {
 
 ## Rate Limiting
 
-```typescript
-const rateLimits = {
-  // Per IP address
-  anonymous: {
-    windowMs: 15 * 60 * 1000,  // 15 minutes
-    max: 100                    // requests
-  },
-  
-  // Per authenticated user
-  authenticated: {
-    windowMs: 15 * 60 * 1000,
-    max: 500
-  },
-  
-  // Specific endpoints
-  endpoints: {
-    '/ocr/upload': {
-      windowMs: 60 * 60 * 1000,  // 1 hour
-      max: 10                     // uploads
+```go
+// Rate limiting configuration in Golang
+package middleware
+
+import (
+    "time"
+    "github.com/gofiber/fiber/v2"
+    "github.com/gofiber/fiber/v2/middleware/limiter"
+)
+
+var RateLimits = struct {
+    // Per IP address (anonymous users)
+    Anonymous limiter.Config
+    
+    // Per authenticated user
+    Authenticated limiter.Config
+    
+    // Specific endpoints
+    OCRUpload       limiter.Config
+    RouteOptimize   limiter.Config
+}{
+    Anonymous: limiter.Config{
+        Max:        100,
+        Expiration: 15 * time.Minute,
     },
-    '/routes/optimize': {
-      windowMs: 60 * 1000,        // 1 minute
-      max: 5                      // calculations
-    }
-  }
-};
+    Authenticated: limiter.Config{
+        Max:        500,
+        Expiration: 15 * time.Minute,
+    },
+    OCRUpload: limiter.Config{
+        Max:        10,
+        Expiration: 1 * time.Hour,
+    },
+    RouteOptimize: limiter.Config{
+        Max:        5,
+        Expiration: 1 * time.Minute,
+    },
+}
 ```
 
 ## Versioning Strategy

@@ -44,12 +44,12 @@ This document contains ASCII diagrams of the Precium system architecture.
 ├─────────────────────────────────────────────────────────────────────────┤
 │                                                                           │
 │  ┌──────────────────────────────────────────────────────────────────┐  │
-│  │              Backend API (Node.js + TypeScript + NestJS)         │  │
+│  │              Backend API (Golang + Fiber)                        │  │
 │  │                                                                   │  │
 │  │  ┌────────────────┐  ┌──────────────┐  ┌──────────────────┐    │  │
 │  │  │ Auth Service   │  │Search Service│  │ Product Service  │    │  │
 │  │  │ • OAuth2/JWT   │  │• Location    │  │ • CRUD           │    │  │
-│  │  │ • Passport.js  │  │• Radius      │  │ • Categories     │    │  │
+│  │  │ • oauth2 lib   │  │• Radius      │  │ • Categories     │    │  │
 │  │  │ • Sessions     │  │• Filters     │  │ • Search         │    │  │
 │  │  └────────────────┘  └──────────────┘  └──────────────────┘    │  │
 │  │                                                                   │  │
@@ -112,8 +112,10 @@ This document contains ASCII diagrams of the Precium system architecture.
 precium/ (root)
 │
 ├── apps/                              📱 Applications
-│   ├── backend/                       🔧 NestJS Backend
-│   │   ├── src/
+│   ├── backend/                       🔧 Golang Backend
+│   │   ├── cmd/
+│   │   │   └── server/               🚀 Entry Point
+│   │   ├── internal/
 │   │   │   ├── auth/                 🔐 Authentication
 │   │   │   ├── users/                👤 User Management
 │   │   │   ├── products/             📦 Product Catalog
@@ -121,12 +123,16 @@ precium/ (root)
 │   │   │   ├── prices/               💰 Price Tracking
 │   │   │   ├── search/               🔍 Search Engine
 │   │   │   ├── routes/               🗺️  Route Optimization
-│   │   │   ├── shopping-lists/       📝 Shopping Lists
+│   │   │   ├── shopping_lists/       📝 Shopping Lists
 │   │   │   ├── ocr/                  📸 Receipt Scanning
 │   │   │   ├── promotions/           🎁 Promotions
 │   │   │   └── notifications/        🔔 Notifications
-│   │   ├── test/
-│   │   └── package.json
+│   │   ├── db/
+│   │   │   ├── migrations/           📄 SQL Migrations
+│   │   │   ├── queries/              📝 SQLC Queries
+│   │   │   └── sqlc/                 🔧 Generated Code
+│   │   ├── go.mod
+│   │   └── go.sum
 │   │
 │   ├── web/                           🌐 React Web App
 │   │   ├── src/
@@ -180,9 +186,8 @@ precium/ (root)
 │       └── build-mobile.yml
 │
 ├── docker-compose.yml                 🐳 Local Development
-├── package.json                       📦 Root Package
-├── turbo.json                         ⚡ Turborepo Config
-├── tsconfig.base.json                 📘 TypeScript Config
+├── package.json                       📦 Frontend Package
+├── tsconfig.base.json                 📘 TypeScript Config (Frontend)
 └── README.md                          📖 Project README
 ```
 

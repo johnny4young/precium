@@ -123,14 +123,23 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '24'
           cache: 'npm'
+
+      - name: Setup Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.22'
+          cache: true
+          cache-dependency-path: apps/backend/go.sum
 
       - name: Install dependencies
         run: npm ci
 
       - name: Lint
-        run: npm run lint
+        run: |
+          npm run lint
+          cd apps/backend && golangci-lint run
 
       - name: Type check
         run: npm run type-check
@@ -150,19 +159,30 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '24'
           cache: 'npm'
 
-      - name: Install dependencies
+      - name: Setup Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.22'
+          cache: true
+
+      - name: Install frontend dependencies
         run: npm ci
 
-      - name: Run unit tests
+      - name: Run frontend unit tests
         run: npm run test:unit -- --coverage
+
+      - name: Run backend unit tests
+        run: |
+          cd apps/backend
+          go test -v -coverprofile=coverage.out ./...
 
       - name: Upload coverage
         uses: codecov/codecov-action@v3
         with:
-          files: ./coverage/coverage-final.json
+          files: ./coverage/coverage-final.json,./apps/backend/coverage.out
           flags: unittests
 
   # Job 3: Integration Tests
@@ -202,19 +222,28 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '24'
           cache: 'npm'
+
+      - name: Setup Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.22'
 
       - name: Install dependencies
         run: npm ci
 
       - name: Run migrations
-        run: npm run migrate
+        run: |
+          cd apps/backend
+          migrate -path db/migrations -database "$DATABASE_URL" up
         env:
           DATABASE_URL: postgresql://test:test@localhost:5432/precium_test
 
       - name: Run integration tests
-        run: npm run test:integration
+        run: |
+          cd apps/backend
+          go test -v ./internal/... -tags=integration
         env:
           DATABASE_URL: postgresql://test:test@localhost:5432/precium_test
           REDIS_URL: redis://localhost:6379
@@ -266,22 +295,39 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Setup Node.js
+        if: matrix.app == 'web'
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '24'
           cache: 'npm'
 
+      - name: Setup Go
+        if: matrix.app == 'backend'
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.22'
+
       - name: Install dependencies
+        if: matrix.app == 'web'
         run: npm ci
 
-      - name: Build ${{ matrix.app }}
-        run: npm run build --workspace=apps/${{ matrix.app }}
+      - name: Build backend
+        if: matrix.app == 'backend'
+        run: |
+          cd apps/backend
+          go build -o bin/server cmd/server/main.go
+
+      - name: Build web
+        if: matrix.app == 'web'
+        run: npm run build --workspace=apps/web
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v3
         with:
           name: ${{ matrix.app }}-build
-          path: apps/${{ matrix.app }}/dist
+          path: |
+            apps/backend/bin/server
+            apps/web/dist
 
   # Job 6: Security Scan
   security:
@@ -574,36 +620,25 @@ aws ecs update-service \
 
 ### Migration Example
 
-```typescript
-// 20260208-add-promotions-table.ts
-import { MigrationInterface, QueryRunner } from 'typeorm';
+```sql
+-- 20260208_add_promotions_table.up.sql
+CREATE TABLE promotions (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    product_id UUID REFERENCES products(id),
+    store_id UUID REFERENCES stores(id),
+    title VARCHAR(255) NOT NULL,
+    discount_value DECIMAL(10, 2),
+    start_date TIMESTAMP NOT NULL,
+    end_date TIMESTAMP NOT NULL,
+    created_at TIMESTAMP DEFAULT NOW()
+);
 
-export class AddPromotionsTable1707408741 implements MigrationInterface {
-  public async up(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.query(`
-      CREATE TABLE promotions (
-        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-        product_id UUID REFERENCES products(id),
-        store_id UUID REFERENCES stores(id),
-        title VARCHAR(255) NOT NULL,
-        discount_value DECIMAL(10, 2),
-        start_date TIMESTAMP NOT NULL,
-        end_date TIMESTAMP NOT NULL,
-        created_at TIMESTAMP DEFAULT NOW()
-      );
-      
-      CREATE INDEX idx_promotions_dates 
-        ON promotions(start_date, end_date);
-    `);
-  }
+CREATE INDEX idx_promotions_dates 
+    ON promotions(start_date, end_date);
 
-  public async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.query(`
-      DROP INDEX idx_promotions_dates;
-      DROP TABLE promotions;
-    `);
-  }
-}
+-- 20260208_add_promotions_table.down.sql
+DROP INDEX idx_promotions_dates;
+DROP TABLE promotions;
 ```
 
 ### Migration Deployment
@@ -634,48 +669,76 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '24'
 
       - name: Install dependencies
         run: npm ci
 
+      - name: Setup Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.22'
+
+      - name: Install golang-migrate
+        run: |
+          curl -L https://github.com/golang-migrate/migrate/releases/download/v4.16.2/migrate.linux-amd64.tar.gz | tar xvz
+          sudo mv migrate /usr/local/bin/
+
       - name: Run migrations
-        run: npm run migrate
+        run: |
+          cd apps/backend
+          migrate -path db/migrations -database $DATABASE_URL up
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
       - name: Verify migrations
-        run: npm run migrate:verify
+        run: |
+          cd apps/backend
+          migrate -path db/migrations -database $DATABASE_URL version
 ```
 
 ## Monitoring & Alerts
 
 ### Health Checks
 
-```typescript
-// apps/backend/src/health/health.controller.ts
-@Controller('health')
-export class HealthController {
-  constructor(
-    private health: HealthCheckService,
-    private db: TypeOrmHealthIndicator,
-    private redis: RedisHealthIndicator,
-  ) {}
+```go
+// apps/backend/internal/health/handler.go
+package health
 
-  @Get()
-  @HealthCheck()
-  check() {
-    return this.health.check([
-      () => this.db.pingCheck('database'),
-      () => this.redis.pingCheck('redis'),
-      () => this.checkExternalServices(),
-    ]);
-  }
+import (
+    "context"
+    "github.com/gofiber/fiber/v2"
+)
 
-  private async checkExternalServices() {
-    // Check Google Vision API, Maps API, etc.
-    return { external: { status: 'up' } };
-  }
+type Handler struct {
+    db    *sql.DB
+    redis *redis.Client
+}
+
+func (h *Handler) Check(c *fiber.Ctx) error {
+    ctx := context.Background()
+    
+    // Check database
+    if err := h.db.PingContext(ctx); err != nil {
+        return c.Status(503).JSON(fiber.Map{
+            "status": "unhealthy",
+            "database": "down",
+        })
+    }
+    
+    // Check Redis
+    if err := h.redis.Ping(ctx).Err(); err != nil {
+        return c.Status(503).JSON(fiber.Map{
+            "status": "unhealthy",
+            "redis": "down",
+        })
+    }
+    
+    return c.JSON(fiber.Map{
+        "status": "healthy",
+        "database": "up",
+        "redis": "up",
+    })
 }
 ```
 

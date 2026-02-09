@@ -15,133 +15,102 @@ precium/
 │   └── copilot-instructions.md      # Copilot instructions
 │
 ├── apps/                             # Applications
-│   ├── backend/                     # Backend API (NestJS)
-│   │   ├── src/
-│   │   │   ├── auth/               # Authentication module
-│   │   │   │   ├── auth.controller.ts
-│   │   │   │   ├── auth.service.ts
-│   │   │   │   ├── auth.module.ts
-│   │   │   │   ├── strategies/     # Passport strategies
-│   │   │   │   │   ├── jwt.strategy.ts
-│   │   │   │   │   ├── google.strategy.ts
-│   │   │   │   │   └── local.strategy.ts
-│   │   │   │   ├── guards/         # Auth guards
-│   │   │   │   │   ├── jwt-auth.guard.ts
-│   │   │   │   │   └── roles.guard.ts
-│   │   │   │   └── decorators/     # Custom decorators
-│   │   │   │       ├── current-user.decorator.ts
-│   │   │   │       └── roles.decorator.ts
+│   ├── backend/                     # Golang Backend
+│   │   ├── cmd/
+│   │   │   └── server/
+│   │   │       └── main.go          # Entry point
+│   │   │
+│   │   ├── internal/
+│   │   │   ├── auth/                # Authentication
+│   │   │   │   ├── handler.go
+│   │   │   │   ├── service.go
+│   │   │   │   ├── repository.go
+│   │   │   │   ├── middleware.go
+│   │   │   │   └── oauth2.go       # OAuth2 implementation
 │   │   │   │
 │   │   │   ├── users/              # Users module
-│   │   │   │   ├── users.controller.ts
-│   │   │   │   ├── users.service.ts
-│   │   │   │   ├── users.module.ts
-│   │   │   │   ├── entities/
-│   │   │   │   │   └── user.entity.ts
-│   │   │   │   └── dto/
-│   │   │   │       ├── create-user.dto.ts
-│   │   │   │       └── update-user.dto.ts
+│   │   │   │   ├── handler.go
+│   │   │   │   ├── service.go
+│   │   │   │   ├── repository.go
+│   │   │   │   └── models.go
 │   │   │   │
 │   │   │   ├── products/           # Products module
-│   │   │   │   ├── products.controller.ts
-│   │   │   │   ├── products.service.ts
-│   │   │   │   ├── products.module.ts
-│   │   │   │   ├── entities/
-│   │   │   │   │   └── product.entity.ts
-│   │   │   │   └── dto/
+│   │   │   │   ├── handler.go
+│   │   │   │   ├── service.go
+│   │   │   │   ├── repository.go
+│   │   │   │   └── models.go
 │   │   │   │
 │   │   │   ├── stores/             # Stores module
-│   │   │   │   ├── stores.controller.ts
-│   │   │   │   ├── stores.service.ts
-│   │   │   │   ├── stores.module.ts
-│   │   │   │   ├── entities/
-│   │   │   │   └── dto/
+│   │   │   │   ├── handler.go
+│   │   │   │   ├── service.go
+│   │   │   │   ├── repository.go
+│   │   │   │   └── models.go
 │   │   │   │
 │   │   │   ├── prices/             # Prices module
-│   │   │   │   ├── prices.controller.ts
-│   │   │   │   ├── prices.service.ts
-│   │   │   │   ├── prices.module.ts
-│   │   │   │   ├── entities/
-│   │   │   │   └── dto/
+│   │   │   │   ├── handler.go
+│   │   │   │   ├── service.go
+│   │   │   │   ├── repository.go
+│   │   │   │   └── models.go
 │   │   │   │
 │   │   │   ├── search/             # Search module
-│   │   │   │   ├── search.controller.ts
-│   │   │   │   ├── search.service.ts
-│   │   │   │   ├── search.module.ts
-│   │   │   │   └── dto/
+│   │   │   │   ├── handler.go
+│   │   │   │   ├── service.go
+│   │   │   │   └── models.go
 │   │   │   │
 │   │   │   ├── routes/             # Route optimization
-│   │   │   │   ├── routes.controller.ts
-│   │   │   │   ├── routes.service.ts
-│   │   │   │   ├── routes.module.ts
+│   │   │   │   ├── handler.go
+│   │   │   │   ├── service.go
 │   │   │   │   ├── algorithms/
-│   │   │   │   │   ├── nearest-neighbor.ts
-│   │   │   │   │   ├── two-opt.ts
-│   │   │   │   │   └── price-optimizer.ts
-│   │   │   │   └── dto/
+│   │   │   │   │   ├── nearest_neighbor.go
+│   │   │   │   │   ├── two_opt.go
+│   │   │   │   │   └── price_optimizer.go
+│   │   │   │   └── models.go
 │   │   │   │
-│   │   │   ├── shopping-lists/     # Shopping lists
-│   │   │   │   ├── shopping-lists.controller.ts
-│   │   │   │   ├── shopping-lists.service.ts
-│   │   │   │   ├── shopping-lists.module.ts
-│   │   │   │   ├── entities/
-│   │   │   │   └── dto/
+│   │   │   ├── shopping_lists/    # Shopping lists
+│   │   │   │   ├── handler.go
+│   │   │   │   ├── service.go
+│   │   │   │   ├── repository.go
+│   │   │   │   └── models.go
 │   │   │   │
-│   │   │   ├── ocr/                # OCR processing
-│   │   │   │   ├── ocr.controller.ts
-│   │   │   │   ├── ocr.service.ts
-│   │   │   │   ├── ocr.module.ts
+│   │   │   ├── ocr/               # OCR processing
+│   │   │   │   ├── handler.go
+│   │   │   │   ├── service.go
 │   │   │   │   ├── processors/
-│   │   │   │   │   ├── vision-api.processor.ts
-│   │   │   │   │   └── receipt-parser.ts
-│   │   │   │   └── dto/
+│   │   │   │   │   ├── vision_api.go
+│   │   │   │   │   └── receipt_parser.go
+│   │   │   │   └── models.go
 │   │   │   │
-│   │   │   ├── promotions/         # Promotions module
-│   │   │   │   ├── promotions.controller.ts
-│   │   │   │   ├── promotions.service.ts
-│   │   │   │   ├── promotions.module.ts
-│   │   │   │   ├── entities/
-│   │   │   │   └── dto/
+│   │   │   ├── promotions/        # Promotions module
+│   │   │   │   ├── handler.go
+│   │   │   │   ├── service.go
+│   │   │   │   ├── repository.go
+│   │   │   │   └── models.go
 │   │   │   │
-│   │   │   ├── notifications/      # Notifications
-│   │   │   │   ├── notifications.controller.ts
-│   │   │   │   ├── notifications.service.ts
-│   │   │   │   ├── notifications.module.ts
+│   │   │   ├── notifications/     # Notifications
+│   │   │   │   ├── handler.go
+│   │   │   │   ├── service.go
 │   │   │   │   └── providers/
-│   │   │   │       ├── push.provider.ts
-│   │   │   │       └── email.provider.ts
+│   │   │   │       ├── push.go
+│   │   │   │       └── email.go
 │   │   │   │
-│   │   │   ├── common/             # Common utilities
-│   │   │   │   ├── decorators/
-│   │   │   │   ├── filters/        # Exception filters
-│   │   │   │   ├── interceptors/   # Interceptors
-│   │   │   │   ├── pipes/          # Validation pipes
-│   │   │   │   └── middleware/
-│   │   │   │
-│   │   │   ├── config/             # Configuration
-│   │   │   │   ├── database.config.ts
-│   │   │   │   ├── auth.config.ts
-│   │   │   │   └── app.config.ts
-│   │   │   │
-│   │   │   ├── database/           # Database
-│   │   │   │   ├── migrations/
-│   │   │   │   ├── seeds/
-│   │   │   │   └── data-source.ts
-│   │   │   │
-│   │   │   ├── app.module.ts       # Root module
-│   │   │   └── main.ts             # Entry point
+│   │   │   └── common/            # Common utilities
+│   │   │       ├── middleware/
+│   │   │       ├── errors/
+│   │   │       └── utils/
 │   │   │
-│   │   ├── test/                   # E2E tests
-│   │   │   ├── auth.e2e-spec.ts
-│   │   │   ├── products.e2e-spec.ts
-│   │   │   └── jest-e2e.json
+│   │   ├── pkg/                   # Public packages
+│   │   │   ├── config/
+│   │   │   ├── logger/
+│   │   │   └── validator/
 │   │   │
-│   │   ├── .env.example            # Environment template
-│   │   ├── .eslintrc.js
-│   │   ├── .prettierrc
-│   │   ├── nest-cli.json
-│   │   ├── package.json
-│   │   ├── tsconfig.json
+│   │   ├── db/                    # Database
+│   │   │   ├── migrations/        # SQL migrations
+│   │   │   ├── queries/           # SQLC queries
+│   │   │   └── sqlc/              # Generated SQLC code
+│   │   │
+│   │   ├── .env.example
+│   │   ├── go.mod
+│   │   ├── go.sum
 │   │   └── README.md
 │   │
 │   ├── web/                        # Web application (React)
@@ -394,9 +363,8 @@ precium/
 ├── .prettierrc
 ├── .eslintrc.js
 ├── docker-compose.yml           # Local development
-├── package.json                 # Root workspace config
-├── turbo.json                   # Turborepo configuration
-├── tsconfig.base.json          # Base TypeScript config
+├── package.json                 # Root workspace config (frontend tooling)
+├── tsconfig.base.json          # Base TypeScript config (frontend)
 └── README.md
 ```
 
@@ -428,70 +396,92 @@ precium/
 
 ### Code Organization
 
-#### Backend (NestJS)
+#### Backend (Golang)
 
-**Module Structure**:
-```typescript
-// products.module.ts
-@Module({
-  imports: [TypeOrmModule.forFeature([Product])],
-  controllers: [ProductsController],
-  providers: [ProductsService],
-  exports: [ProductsService], // Export if used by other modules
-})
-export class ProductsModule {}
-```
+**Handler Pattern**:
+```go
+// products/handler.go
+package products
 
-**Service Pattern**:
-```typescript
-// products.service.ts
-@Injectable()
-export class ProductsService {
-  constructor(
-    @InjectRepository(Product)
-    private productsRepository: Repository<Product>,
-    private cacheService: CacheService,
-  ) {}
+import (
+    "github.com/gofiber/fiber/v2"
+)
 
-  async findAll(filters: ProductFilters): Promise<Product[]> {
-    const cacheKey = `products:${JSON.stringify(filters)}`;
-    const cached = await this.cacheService.get(cacheKey);
+type Handler struct {
+    service *Service
+}
+
+func NewHandler(service *Service) *Handler {
+    return &Handler{service: service}
+}
+
+func (h *Handler) GetAll(c *fiber.Ctx) error {
+    filters := ProductFilters{
+        Category: c.Query("category"),
+        Brand:    c.Query("brand"),
+    }
     
-    if (cached) return cached;
+    products, err := h.service.FindAll(c.Context(), filters)
+    if err != nil {
+        return c.Status(500).JSON(fiber.Map{
+            "error": err.Error(),
+        })
+    }
     
-    const products = await this.productsRepository.find({
-      where: filters,
-    });
+    return c.JSON(products)
+}
+
+func (h *Handler) Create(c *fiber.Ctx) error {
+    var dto CreateProductDTO
+    if err := c.BodyParser(&dto); err != nil {
+        return c.Status(400).JSON(fiber.Map{
+            "error": "Invalid request body",
+        })
+    }
     
-    await this.cacheService.set(cacheKey, products, 3600);
-    return products;
-  }
+    product, err := h.service.Create(c.Context(), dto)
+    if err != nil {
+        return c.Status(500).JSON(fiber.Map{
+            "error": err.Error(),
+        })
+    }
+    
+    return c.Status(201).JSON(product)
 }
 ```
 
-**Controller Pattern**:
-```typescript
-// products.controller.ts
-@Controller('products')
-@UseGuards(JwtAuthGuard)
-export class ProductsController {
-  constructor(private readonly productsService: ProductsService) {}
+**Service Pattern**:
+```go
+// products/service.go
+package products
 
-  @Get()
-  @ApiOperation({ summary: 'Get all products' })
-  @ApiResponse({ status: 200, description: 'Products retrieved successfully' })
-  async findAll(
-    @Query() filters: ProductFiltersDto,
-  ): Promise<Product[]> {
-    return this.productsService.findAll(filters);
-  }
+import (
+    "context"
+    "github.com/precium/backend/db/sqlc"
+)
 
-  @Post()
-  @Roles('admin')
-  @UseGuards(RolesGuard)
-  async create(@Body() dto: CreateProductDto): Promise<Product> {
-    return this.productsService.create(dto);
-  }
+type Service struct {
+    queries *sqlc.Queries
+}
+
+func NewService(queries *sqlc.Queries) *Service {
+    return &Service{queries: queries}
+}
+
+func (s *Service) FindAll(ctx context.Context, filters ProductFilters) ([]sqlc.Product, error) {
+    return s.queries.ListProducts(ctx, sqlc.ListProductsParams{
+        Category: filters.Category,
+        Brand:    filters.Brand,
+    })
+}
+
+func (s *Service) Create(ctx context.Context, dto CreateProductDTO) (sqlc.Product, error) {
+    return s.queries.CreateProduct(ctx, sqlc.CreateProductParams{
+        Name:        dto.Name,
+        Description: dto.Description,
+        CategoryID:  dto.CategoryID,
+        Brand:       dto.Brand,
+    })
 }
 ```
 

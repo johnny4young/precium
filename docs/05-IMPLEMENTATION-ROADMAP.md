@@ -31,9 +31,9 @@ Set up the project infrastructure, development environment, and implement authen
 ### Deliverables
 
 #### Week 1: Project Setup
-- [x] Initialize monorepo with Turborepo
+- [x] Initialize monorepo with npm workspaces + Vite
 - [x] Set up folder structure (apps/ and packages/)
-- [x] Configure TypeScript with path aliases
+- [x] Configure TypeScript with path aliases (frontend only)
 - [x] Set up ESLint and Prettier
 - [x] Configure Git hooks (Husky)
 - [x] Create Docker Compose for local development
@@ -45,17 +45,16 @@ Set up the project infrastructure, development environment, and implement authen
 **Key Files**:
 ```
 /package.json (workspace config)
-/turbo.json
 /docker-compose.yml
 /.github/workflows/ci.yml
 ```
 
 #### Week 2: Backend Foundation
-- [ ] Set up NestJS backend application
-- [ ] Configure database connection (TypeORM/Prisma)
-- [ ] Implement database migrations
-- [ ] Create base entities (User, Store, Product)
-- [ ] Set up logging (Winston/Pino)
+- [ ] Set up Golang backend application with Fiber
+- [ ] Configure database connection with SQLC
+- [ ] Implement database migrations (golang-migrate)
+- [ ] Create base models (User, Store, Product)
+- [ ] Set up logging (zerolog/zap)
 - [ ] Configure environment variables
 - [ ] Implement health check endpoints
 - [ ] Set up API documentation (Swagger)
@@ -69,7 +68,7 @@ GET  /api/v1/docs
 
 #### Week 3: Authentication System
 - [ ] Implement JWT authentication
-- [ ] Set up Passport.js
+- [ ] Set up golang.org/x/oauth2
 - [ ] Implement Google OAuth
 - [ ] Implement email/password registration
 - [ ] Create user service and repository
@@ -110,11 +109,11 @@ POST /api/v1/auth/logout
 - ✅ CI/CD pipeline is green
 
 ### Tech Stack Decisions
-- Backend: NestJS + TypeScript
-- ORM: Prisma (cleaner API) or TypeORM (more features)
+- Backend: Golang + Fiber
+- Database: SQLC (type-safe SQL code generation)
 - Frontend: React + TypeScript + Tailwind
 - Mobile: React Native + Expo
-- Testing: Jest + Testing Library
+- Testing: Go testing package + Jest (frontend)
 
 ---
 
@@ -310,7 +309,7 @@ Implement smart shopping route optimization.
 - [ ] Benchmark performance
 
 **Algorithm Considerations**:
-```typescript
+```go
 // For small sets (< 10 stores): Exact solutions possible
 // For larger sets: Approximation algorithms
 // - Nearest Neighbor: O(n²)
@@ -418,7 +417,7 @@ Enable users to scan receipts and contribute price data.
 - [ ] Handle various receipt formats
 
 **Pattern Recognition**:
-```typescript
+```go
 // Detect common patterns:
 // - Store name at top
 // - Products with prices aligned
@@ -612,9 +611,8 @@ Prepare the application for production launch.
 - [ ] Budget tracking
 
 ### Iteration 8: Scale & Optimize (Optional)
-- [ ] Extract route optimization to Golang service
 - [ ] Implement Elasticsearch for search
-- [ ] Add GraphQL API
+- [ ] Add GraphQL API (if needed)
 - [ ] Implement real-time updates (WebSockets)
 - [ ] Create native mobile apps (Swift/Kotlin)
 - [ ] International expansion
@@ -627,7 +625,7 @@ Prepare the application for production launch.
 
 ### Development Team
 ```
-- 1 Backend Developer (Node.js/TypeScript)
+- 1 Backend Developer (Golang)
 - 1 Frontend Developer (React)
 - 1 Mobile Developer (React Native)
 - 1 Full-Stack Developer (Flex)
@@ -661,7 +659,7 @@ Prepare the application for production launch.
 
 1. **Route Optimization Performance**
    - *Risk*: Algorithm too slow for large datasets
-   - *Mitigation*: Implement timeout, use approximation algorithms, consider Golang microservice
+   - *Mitigation*: Implement timeout, use approximation algorithms, Golang provides excellent performance
    
 2. **OCR Accuracy**
    - *Risk*: Low accuracy on receipts

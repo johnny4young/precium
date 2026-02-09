@@ -4,8 +4,9 @@
 
 ### Prerequisites
 
-- Node.js 20 LTS
+- Node.js 24 LTS (for frontend tooling)
 - npm 10+
+- Go 1.22+
 - Docker & Docker Compose
 - Git
 - PostgreSQL 15+ (via Docker)
@@ -68,10 +69,20 @@ git push origin feature/your-feature-name
 ### 2. Working in the Monorepo
 
 ```bash
-# Run command in specific workspace
-npm run dev --workspace=apps/backend
+# Run command in specific workspace (frontend apps)
+npm run dev --workspace=apps/web
 npm run build --workspace=apps/web
 npm run test --workspace=packages/shared-types
+
+# Build backend (Golang)
+cd apps/backend
+go build -o bin/server cmd/server/main.go
+
+# Run backend
+./bin/server
+
+# Or use air for hot reload
+air
 
 # Run command in all workspaces
 npm run test
@@ -81,26 +92,55 @@ npm install axios --workspace=apps/backend
 npm install -D @types/node --workspace=apps/backend
 ```
 
-### 3. Database Management
+### Database Management
 
 ```bash
-# Create new migration
-npm run migration:create --name=add-new-table
+# Create new migration (using golang-migrate)
+cd apps/backend
+migrate create -ext sql -dir db/migrations -seq add_new_table
 
 # Run migrations
-npm run migrate
+migrate -path db/migrations -database "postgresql://user:pass@localhost:5432/precium?sslmode=disable" up
 
 # Rollback migration
-npm run migrate:rollback
+migrate -path db/migrations -database "postgresql://user:pass@localhost:5432/precium?sslmode=disable" down 1
+
+# Generate SQLC code
+sqlc generate
 
 # Seed database
-npm run seed
+go run scripts/seed.go
 
 # Reset database (drop, create, migrate, seed)
-npm run db:reset
+./scripts/db_reset.sh
 ```
 
 ## Code Style Guide
+
+### Golang
+
+```go
+// ✅ GOOD
+type User struct {
+    ID    string `json:"id" db:"id"`
+    Name  string `json:"name" db:"name" validate:"required,min=3"`
+    Email string `json:"email" db:"email" validate:"required,email"`
+}
+
+func GetUserByID(ctx context.Context, id string) (*User, error) {
+    user, err := queries.GetUser(ctx, id)
+    if err != nil {
+        return nil, fmt.Errorf("failed to get user: %w", err)
+    }
+    return &user, nil
+}
+
+// ❌ BAD
+func GetUserByID(id interface{}) interface{} {
+    user, _ := queries.GetUser(context.Background(), id)
+    return user
+}
+```
 
 ### TypeScript
 
@@ -190,7 +230,49 @@ class Example {
 
 ## Testing Guidelines
 
-### Unit Tests
+### Backend Tests (Go)
+
+```go
+// products_test.go
+package products
+
+import (
+    "context"
+    "testing"
+    "github.com/stretchr/testify/assert"
+)
+
+func TestProductService_FindAll(t *testing.T) {
+    // Setup
+    ctx := context.Background()
+    service := NewService(mockQueries)
+    
+    // Execute
+    products, err := service.FindAll(ctx, ProductFilters{})
+    
+    // Assert
+    assert.NoError(t, err)
+    assert.NotNil(t, products)
+    assert.Greater(t, len(products), 0)
+}
+
+func TestProductService_Create(t *testing.T) {
+    ctx := context.Background()
+    service := NewService(mockQueries)
+    
+    dto := CreateProductDTO{
+        Name:  "Test Product",
+        Price: 9.99,
+    }
+    
+    product, err := service.Create(ctx, dto)
+    
+    assert.NoError(t, err)
+    assert.Equal(t, "Test Product", product.Name)
+}
+```
+
+### Frontend Unit Tests
 
 ```typescript
 // ProductService.spec.ts
@@ -239,46 +321,40 @@ describe('ProductService', () => {
 });
 ```
 
-### Integration Tests
+### Backend Integration Tests
 
-```typescript
-// products.e2e-spec.ts
-describe('Products (e2e)', () => {
-  let app: INestApplication;
-  let authToken: string;
+```go
+// products_integration_test.go
+package products_test
 
-  beforeAll(async () => {
-    const moduleFixture = await Test.createTestingModule({
-      imports: [AppModule],
-    }).compile();
+import (
+    "bytes"
+    "encoding/json"
+    "net/http"
+    "net/http/httptest"
+    "testing"
+    "github.com/stretchr/testify/assert"
+)
 
-    app = moduleFixture.createNestApplication();
-    await app.init();
-
-    // Get auth token
-    const loginResponse = await request(app.getHttpServer())
-      .post('/auth/login')
-      .send({ email: 'test@example.com', password: 'password' });
+func TestProductsHandler_GetAll(t *testing.T) {
+    // Setup
+    app := setupTestApp()
     
-    authToken = loginResponse.body.accessToken;
-  });
-
-  afterAll(async () => {
-    await app.close();
-  });
-
-  describe('GET /products', () => {
-    it('should return products list', () => {
-      return request(app.getHttpServer())
-        .get('/products')
-        .set('Authorization', `Bearer ${authToken}`)
-        .expect(200)
-        .expect((res) => {
-          expect(Array.isArray(res.body.data)).toBe(true);
-        });
-    });
-  });
-});
+    // Create request
+    req := httptest.NewRequest("GET", "/api/v1/products", nil)
+    req.Header.Set("Authorization", "Bearer "+testToken)
+    
+    // Execute
+    resp, err := app.Test(req)
+    
+    // Assert
+    assert.NoError(t, err)
+    assert.Equal(t, 200, resp.StatusCode)
+    
+    var result ProductsResponse
+    json.NewDecoder(resp.Body).Decode(&result)
+    assert.NotEmpty(t, result.Data)
+}
 ```
 
 ### E2E Tests (Playwright)
@@ -577,23 +653,36 @@ delete(@Param('id') id: string) {
 
 ### Backend Debugging
 
-```typescript
-// Use logger instead of console.log
-this.logger.debug('Processing product', { productId });
-this.logger.error('Failed to save', error);
+```go
+// Use structured logging instead of fmt.Println
+import "github.com/rs/zerolog/log"
 
-// Use debugging breakpoints
-// In VS Code, add to launch.json:
+log.Debug().
+    Str("productId", productID).
+    Msg("Processing product")
+    
+log.Error().
+    Err(err).
+    Msg("Failed to save")
+
+// Use Delve debugger
+// Install: go install github.com/go-delve/delve/cmd/dlv@latest
+
+// Run with debugger
+dlv debug cmd/server/main.go
+
+// Or attach to running process
+dlv attach <PID>
+
+// VS Code launch.json for Go:
 {
-  "type": "node",
-  "request": "attach",
-  "name": "Attach to NestJS",
-  "port": 9229,
-  "restart": true
+  "type": "go",
+  "request": "launch",
+  "name": "Launch Server",
+  "program": "${workspaceFolder}/apps/backend/cmd/server",
+  "env": {},
+  "args": []
 }
-
-// Then run:
-npm run start:debug
 ```
 
 ### Frontend Debugging
@@ -668,18 +757,25 @@ npm run build
 ## Helpful Commands
 
 ```bash
-# Development
-npm run dev                    # Start all apps
-npm run dev:backend           # Start backend only
+# Backend Development (Golang)
+cd apps/backend
+go run cmd/server/main.go     # Run server
+go build -o bin/server cmd/server/main.go  # Build
+go test ./...                 # Run all tests
+go test -v ./internal/products  # Run specific package tests
+go test -cover ./...          # Test with coverage
+air                           # Hot reload (requires air)
+
+# Frontend Development
+npm run dev                   # Start all frontend apps
 npm run dev:web               # Start web only
 npm run dev:mobile            # Start mobile only
 
-# Building
+# Building Frontend
 npm run build                 # Build all
-npm run build:backend         # Build backend
 npm run build:web             # Build web
 
-# Testing
+# Frontend Testing
 npm run test                  # Run all tests
 npm run test:watch            # Run tests in watch mode
 npm run test:cov              # Run with coverage
@@ -690,27 +786,32 @@ npm run lint                  # Lint all
 npm run lint:fix              # Auto-fix issues
 npm run format                # Format code
 npm run format:check          # Check formatting
+gofmt -w .                    # Format Go code
+golangci-lint run             # Lint Go code
 
 # Database
-npm run migrate               # Run migrations
-npm run migrate:rollback      # Rollback last migration
-npm run seed                  # Seed database
-npm run db:reset              # Reset database
+cd apps/backend
+migrate -path db/migrations -database $DATABASE_URL up
+migrate -path db/migrations -database $DATABASE_URL down 1
+sqlc generate                 # Generate SQLC code
+go run scripts/seed.go        # Seed database
 
 # Docker
 docker-compose up -d          # Start services
 docker-compose down           # Stop services
 docker-compose logs -f        # View logs
+docker-compose logs -f backend  # View backend logs only
 ```
 
 ## Resources
 
-- [NestJS Documentation](https://docs.nestjs.com/)
+- [Go Documentation](https://go.dev/doc/)
+- [Fiber Framework](https://docs.gofiber.io/)
+- [SQLC Documentation](https://docs.sqlc.dev/)
 - [React Documentation](https://react.dev/)
 - [React Native Documentation](https://reactnative.dev/)
 - [TypeScript Handbook](https://www.typescriptlang.org/docs/)
 - [PostgreSQL Documentation](https://www.postgresql.org/docs/)
-- [Turborepo Documentation](https://turbo.build/repo/docs)
 
 ---
 
