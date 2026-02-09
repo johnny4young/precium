@@ -32,6 +32,7 @@ Infrastructure and deployment:
 - **[CI/CD Strategy](08-CI-CD-STRATEGY.md)** - Complete deployment pipeline
 - **[System Architecture](03-SYSTEM-ARCHITECTURE.md)** - Infrastructure requirements
 - **[Development Guidelines](07-DEVELOPMENT-GUIDELINES.md)** - Local setup
+- **[Supabase Deployment Guide](15-SUPABASE-DEPLOYMENT-GUIDE.md)** - Database deployment to Supabase
 
 ### For Project Managers
 Planning and timeline:
@@ -139,7 +140,29 @@ Planning and timeline:
     - **Recommendation: Fiber v2.52+** for Precium
     - Implementation plan and code examples
 
-**Total**: 14 documents, ~254,000 words
+15. **[14-WEB-SCRAPING-ARCHITECTURE.md](14-WEB-SCRAPING-ARCHITECTURE.md)** (~30,000 words) ⭐ NEW ✅ Complete
+    - **Web scraping with Colly** (Golang scraping framework)
+    - **Cron job scheduling** with gocron for automated data collection
+    - Scalable and configurable scraper architecture
+    - Store, product, and price scraping
+    - Job queue with Asynq (Redis-backed)
+    - Data pipeline (validation, deduplication, storage)
+    - Error handling and resilience (retry, circuit breaker)
+    - Complete implementation guide with code examples
+
+16. **[15-SUPABASE-DEPLOYMENT-GUIDE.md](15-SUPABASE-DEPLOYMENT-GUIDE.md)** (~25,000 words) ⭐ NEW ✅ Complete
+    - **Supabase deployment** for PostgreSQL database
+    - PostGIS extension configuration
+    - pg_trgm and unaccent setup for fuzzy search
+    - Database migrations with golang-migrate
+    - Connection pooling configuration
+    - Environment variables setup
+    - Backup and restore procedures
+    - Performance optimization tips
+    - Security best practices
+    - Cost estimation and scaling recommendations
+
+**Total**: 16 documents, ~309,000 words
 
 ---
 
