@@ -142,9 +142,11 @@ Precium is a location-based price comparison application that helps users find t
 - Role-based access control (RBAC)
 
 **Technologies**:
-- Passport.js for OAuth strategies
-- jsonwebtoken for JWT
-- bcrypt for password hashing
+- **golang.org/x/oauth2** for OAuth2 flows
+- **golang-jwt/jwt** for JWT generation and validation
+- **golang.org/x/crypto/bcrypt** for password hashing
+- **Casbin** for authorization (RBAC/ABAC)
+- No Auth.js/NextAuth needed (frontend handles OAuth flow, backend validates tokens)
 
 **API Endpoints**:
 ```
@@ -175,20 +177,29 @@ GET    /auth/me
 - Redis for caching frequent searches
 
 **Key Algorithms**:
-```typescript
-// Distance calculation using PostGIS
+```go
+// Using SQLC-generated code for type-safe queries
+// queries/search.sql
+-- name: SearchStoresNearby :many
 SELECT s.*, 
        ST_Distance(
          ST_MakePoint(s.longitude, s.latitude)::geography,
-         ST_MakePoint($userLon, $userLat)::geography
+         ST_MakePoint($1, $2)::geography
        ) as distance
 FROM stores s
 WHERE ST_DWithin(
   ST_MakePoint(s.longitude, s.latitude)::geography,
-  ST_MakePoint($userLon, $userLat)::geography,
-  $radiusMeters
+  ST_MakePoint($1, $2)::geography,
+  $3
 )
-ORDER BY distance
+ORDER BY distance;
+
+// Go code using SQLC
+stores, err := queries.SearchStoresNearby(ctx, db.SearchStoresNearbyParams{
+    Longitude: userLon,
+    Latitude:  userLat,
+    Radius:    radiusMeters,
+})
 ```
 
 **API Endpoints**:
@@ -617,13 +628,16 @@ logger.info('Product searched', {
 
 | Component | Technology | Rationale |
 |-----------|-----------|-----------|
-| Backend Framework | NestJS or Fastify | Structure + Performance |
+| Backend Language | Golang 1.23+ | Performance + Concurrency |
+| Backend Framework | Fiber 2.52+ | Fastest Go web framework |
 | Frontend Web | React + TypeScript | Industry standard |
 | Mobile | React Native | Code sharing |
-| Database | PostgreSQL + PostGIS | Relational + GIS |
-| Cache | Redis | Performance |
+| Database | PostgreSQL 17 + PostGIS | Relational + GIS |
+| Query Builder | SQLC | Type-safe SQL generation |
+| Cache | Redis 7+ | Performance |
 | File Storage | AWS S3 / GCS | Scalability |
-| Authentication | Passport.js + JWT | Flexibility |
+| Authentication | golang.org/x/oauth2 + JWT | Native Golang OAuth2 |
+| Authorization | Casbin | Flexible RBAC/ABAC |
 | OCR | Google Vision API | Accuracy |
 | Maps | Google Maps API | Reliability |
 | Monitoring | Datadog | Comprehensive |

@@ -324,10 +324,21 @@ POST   /ocr/jobs/:id/review
 - Database encryption at rest
 - Secure secret management
 - Input validation and sanitization
-- SQL injection prevention via ORM
+- SQL injection prevention via SQLC (parameterized queries)
 - XSS protection
 - CSRF protection
 - Rate limiting
+
+### Authorization (Using Casbin)
+- **Casbin** for flexible RBAC/ABAC authorization
+- Policy-driven access control (config-based)
+- Role hierarchies: user → premium_user → pro_user → admin
+- Resource-level permissions (own shopping lists, own stores)
+- Subscription tier enforcement middleware
+- <1ms authorization checks (in-memory evaluation)
+- PostgreSQL adapter for policy persistence
+- Future-proof for complex ABAC scenarios
+- See docs/12-CASBIN-AUTHORIZATION-ANALYSIS.md for details
 
 ### Privacy
 - GDPR compliance
@@ -440,7 +451,7 @@ POST   /ocr/jobs/:id/review
 ## Team Requirements
 
 ### Core Team
-- **1 Backend Developer** - Node.js/TypeScript expert
+- **1 Backend Developer** - Golang expert
 - **1 Frontend Developer** - React specialist
 - **1 Mobile Developer** - React Native expert
 - **1 Full-Stack Developer** - Flexible support

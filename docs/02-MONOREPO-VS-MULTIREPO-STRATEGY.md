@@ -366,12 +366,24 @@ Consider multi-repo if:
 
 ### Phase 1: Setup Monorepo (Week 1)
 
-1. Initialize Turborepo
+1. Initialize npm workspaces (native, no Turborepo needed)
 ```bash
-npx create-turbo@latest
+mkdir precium && cd precium
+npm init -y
 ```
 
-2. Configure workspaces in `package.json`
+2. Configure workspaces in root `package.json`
+```json
+{
+  "name": "precium",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ]
+}
+```
+
 3. Set up basic folder structure
 4. Configure TypeScript path aliases
 5. Set up ESLint and Prettier
@@ -435,15 +447,16 @@ import { validateProduct } from '@precium/validation';
 
 ## Conclusion
 
-**Recommendation: Start with Monorepo using Turborepo**
+**Recommendation: Start with Monorepo using npm workspaces + Vite**
 
-The benefits of code sharing, atomic changes, and unified development experience far outweigh the complexities for a project of Precium's size and scope. The TypeScript stack across all platforms makes this especially valuable.
+The benefits of code sharing, atomic changes, and unified development experience far outweigh the complexities for a project of Precium's size and scope. The mixed-language stack (Golang backend + TypeScript frontend) makes npm workspaces the ideal choice - simpler than Turborepo, native to npm, and works perfectly with Go toolchain.
 
 You can always split later if needed, but starting with a monorepo will accelerate development and make it easier to maintain consistency across web, mobile, and backend.
 
 ---
 
-**Decision Date**: 2026-02-08
+**Decision Date**: 2026-02-09
 **Review Date**: After 6 months or when team reaches 15+ developers
-**Recommended Tool**: Turborepo
-**Alternative Tool**: Nx (if need more structure)
+**Recommended Tool**: npm workspaces (native)
+**Build Tool**: Vite for frontend, go build for backend
+**Alternative**: Turborepo (if we add many more JavaScript/TypeScript services)
