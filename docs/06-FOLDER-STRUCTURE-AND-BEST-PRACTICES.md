@@ -718,31 +718,30 @@ async function getProductById(id: string): Promise<Product> {
   return product;
 }
 
-// Global exception filter (NestJS)
-@Catch()
-export class GlobalExceptionFilter implements ExceptionFilter {
-  catch(exception: unknown, host: ArgumentsHost) {
-    const ctx = host.switchToHttp();
-    const response = ctx.getResponse();
-    const request = ctx.getRequest();
+// Global error handler (Golang)
+package middleware
 
-    const status = exception instanceof HttpException
-      ? exception.getStatus()
-      : 500;
+import (
+    "github.com/gofiber/fiber/v2"
+)
 
-    const message = exception instanceof Error
-      ? exception.message
-      : 'Internal server error';
-
-    response.status(status).json({
-      error: {
-        statusCode: status,
-        message,
-        timestamp: new Date().toISOString(),
-        path: request.url,
-      },
-    });
-  }
+func ErrorHandler(c *fiber.Ctx, err error) error {
+    code := fiber.StatusInternalServerError
+    message := "Internal server error"
+    
+    if e, ok := err.(*fiber.Error); ok {
+        code = e.Code
+        message = e.Message
+    }
+    
+    return c.Status(code).JSON(fiber.Map{
+        "error": fiber.Map{
+            "statusCode": code,
+            "message":    message,
+            "timestamp":  time.Now().Format(time.RFC3339),
+            "path":       c.Path(),
+        },
+    })
 }
 ```
 

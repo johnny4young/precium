@@ -296,14 +296,15 @@ If you find errors or have suggestions:
 
 ## 🔗 External Resources
 
-### Technologies Referenced
-- [NestJS Documentation](https://docs.nestjs.com/)
+### External Technologies Referenced
+- [Go Documentation](https://go.dev/doc/)
+- [Fiber Framework](https://docs.gofiber.io/)
+- [SQLC Documentation](https://docs.sqlc.dev/)
 - [React Documentation](https://react.dev/)
 - [React Native Documentation](https://reactnative.dev/)
 - [TypeScript Handbook](https://www.typescriptlang.org/docs/)
 - [PostgreSQL Documentation](https://www.postgresql.org/docs/)
 - [PostGIS Documentation](https://postgis.net/documentation/)
-- [Turborepo Documentation](https://turbo.build/repo/docs)
 - [GitHub Actions Documentation](https://docs.github.com/en/actions)
 
 ### Similar Projects (Inspiration)
