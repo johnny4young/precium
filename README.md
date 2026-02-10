@@ -21,7 +21,7 @@ Precium is a comprehensive price comparison application that combines:
 This project uses a **monorepo** structure with the following tech stack:
 
 - **Backend**: Golang 1.23+ with Fiber framework (high-performance)
-- **Frontend Web**: React 18+ + TypeScript 5.7+ + Vite 6+ + Tailwind CSS
+- **Frontend Web**: React 19+ + TypeScript 5.7+ + Vite 7+ + Tailwind CSS 4+
 - **Mobile**: React Native 0.76+ + TypeScript 5.7+
 - **Database**: PostgreSQL 17+ with PostGIS 3.4, pg_trgm (fuzzy search), unaccent (Spanish)
 - **Query Builder**: SQLC (type-safe Go code from SQL)
@@ -44,6 +44,8 @@ Comprehensive documentation is available in the `/docs` directory:
 
 ## 🚀 Quick Start
 
+Precium is a smart price comparison platform that helps users find the best deals on products across multiple stores. The application uses geolocation to show nearby stores, calculates optimal shopping routes, and allows users to contribute price data via receipt scanning.
+
 ### Prerequisites
 
 - Node.js 24+ and npm 10+
@@ -61,6 +63,10 @@ cd precium
 # Install dependencies
 npm install
 
+# Set up environment variables
+cp .env.example .env
+# Edit .env with your database credentials
+
 # Start development environment with Docker
 docker-compose up -d
 
@@ -74,6 +80,36 @@ go run cmd/server/main.go
 # 2. Start web frontend (React)
 cd apps/web
 npm run dev
+```
+
+### Running Tests
+
+```bash
+# Run all tests
+npm test
+
+# Run backend tests
+cd apps/backend
+go test ./...
+
+# Run frontend tests
+cd apps/web
+npm run test
+```
+
+### Building for Production
+
+```bash
+# Build all applications
+npm run build
+
+# Build backend binary
+cd apps/backend
+go build -o bin/server cmd/server/main.go
+
+# Build web frontend
+cd apps/web
+npm run build
 ```
 
 ### Development
