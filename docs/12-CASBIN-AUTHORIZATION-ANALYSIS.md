@@ -19,6 +19,7 @@ Casbin is an excellent fit for Precium's authorization needs, providing flexible
 ## 1. What is Casbin?
 
 Casbin is an open-source authorization library that supports multiple access control models including:
+
 - **RBAC** (Role-Based Access Control)
 - **ABAC** (Attribute-Based Access Control)
 - **ACL** (Access Control Lists)
@@ -26,6 +27,7 @@ Casbin is an open-source authorization library that supports multiple access con
 - **Hybrid models** (combining multiple approaches)
 
 ### Key Features
+
 - **Multi-model support**: Switch or combine models by editing configuration
 - **Language support**: Native Golang implementation (perfect for our backend)
 - **Persistence**: Built-in adapters for PostgreSQL, MySQL, Redis, etc.
@@ -59,15 +61,15 @@ For the Precium platform, we need:
 
 ### 2.2 How Casbin Fits
 
-| Requirement | Casbin Capability | How It Helps |
-|------------|-------------------|--------------|
-| User roles | RBAC with hierarchies | Built-in support for role inheritance |
-| Subscription tiers | RBAC + ABAC | Can check `user.subscription_tier` dynamically |
-| Resource ownership | ABAC | Check `user.id == resource.owner_id` |
-| Store permissions | Domain RBAC | Store owners get admin role in their store domain |
-| Multi-tenancy | Domain support | Separate permissions per store/organization |
-| Audit logging | Adapter pattern | Log all authorization decisions |
-| Performance | In-memory + caching | <1ms evaluation for most checks |
+| Requirement        | Casbin Capability     | How It Helps                                      |
+| ------------------ | --------------------- | ------------------------------------------------- |
+| User roles         | RBAC with hierarchies | Built-in support for role inheritance             |
+| Subscription tiers | RBAC + ABAC           | Can check `user.subscription_tier` dynamically    |
+| Resource ownership | ABAC                  | Check `user.id == resource.owner_id`              |
+| Store permissions  | Domain RBAC           | Store owners get admin role in their store domain |
+| Multi-tenancy      | Domain support        | Separate permissions per store/organization       |
+| Audit logging      | Adapter pattern       | Log all authorization decisions                   |
+| Performance        | In-memory + caching   | <1ms evaluation for most checks                   |
 
 ---
 
@@ -225,10 +227,10 @@ func RequirePermission(resource, action string) fiber.Handler {
     return func(c *fiber.Ctx) error {
         // Get user from JWT context
         userID := c.Locals("userID").(string)
-        
+
         // Get Casbin authorizor from app
         authz := c.Locals("authorizor").(*auth.CasbinAuthorizor)
-        
+
         // Check permission
         allowed, err := authz.Authorize(userID, resource, action)
         if err != nil {
@@ -236,13 +238,13 @@ func RequirePermission(resource, action string) fiber.Handler {
                 "error": "Authorization check failed",
             })
         }
-        
+
         if !allowed {
             return c.Status(403).JSON(fiber.Map{
                 "error": "Insufficient permissions",
             })
         }
-        
+
         return c.Next()
     }
 }
@@ -251,14 +253,14 @@ func RequireSubscription(tier string) fiber.Handler {
     return func(c *fiber.Ctx) error {
         userID := c.Locals("userID").(string)
         authz := c.Locals("authorizor").(*auth.CasbinAuthorizor)
-        
+
         if !authz.CheckSubscription(userID, tier) {
             return c.Status(402).JSON(fiber.Map{
                 "error": "This feature requires a subscription upgrade",
                 "required_tier": tier,
             })
         }
-        
+
         return c.Next()
     }
 }
@@ -277,23 +279,23 @@ import (
 
 func SetupShoppingListRoutes(app *fiber.App) {
     lists := app.Group("/api/v1/shopping-lists")
-    
+
     // Anyone can create a list (basic users limited to 3)
-    lists.Post("/", 
+    lists.Post("/",
         middleware.RequireAuth(),
         middleware.RequirePermission("shopping_list", "create"),
         createShoppingList,
     )
-    
+
     // Premium feature: unlimited lists
-    lists.Post("/advanced", 
+    lists.Post("/advanced",
         middleware.RequireAuth(),
         middleware.RequireSubscription("role:premium_user"),
         createShoppingList,
     )
-    
+
     // Can only update own lists
-    lists.Put("/:id", 
+    lists.Put("/:id",
         middleware.RequireAuth(),
         middleware.RequirePermission("shopping_list:own", "update"),
         updateShoppingList,
@@ -303,17 +305,17 @@ func SetupShoppingListRoutes(app *fiber.App) {
 // internal/routes/stores.go
 func SetupStoreRoutes(app *fiber.App) {
     stores := app.Group("/api/v1/stores")
-    
+
     // Pro users can manage stores
-    stores.Post("/", 
+    stores.Post("/",
         middleware.RequireAuth(),
         middleware.RequireSubscription("role:pro_user"),
         middleware.RequirePermission("store:own", "create"),
         createStore,
     )
-    
+
     // Admins and moderators can approve stores
-    stores.Post("/:id/approve", 
+    stores.Post("/:id/approve",
         middleware.RequireAuth(),
         middleware.RequirePermission("store", "approve"),
         approveStore,
@@ -327,42 +329,42 @@ func SetupStoreRoutes(app *fiber.App) {
 
 ### 4.1 Casbin vs Custom RBAC
 
-| Aspect | Casbin | Custom Implementation |
-|--------|--------|----------------------|
-| **Development time** | 1-2 days | 1-2 weeks |
-| **Flexibility** | High (config-driven) | Medium (code changes) |
-| **Testing** | Built-in testing tools | Manual testing needed |
-| **Maintenance** | Low (community updates) | High (all bugs on us) |
-| **Performance** | Optimized (~0.5ms) | Depends on implementation |
-| **Audit** | Built-in with adapters | Need to build |
-| **Role hierarchies** | Native support | Complex to implement |
-| **Multi-tenancy** | Domain support | Complex to implement |
+| Aspect               | Casbin                  | Custom Implementation     |
+| -------------------- | ----------------------- | ------------------------- |
+| **Development time** | 1-2 days                | 1-2 weeks                 |
+| **Flexibility**      | High (config-driven)    | Medium (code changes)     |
+| **Testing**          | Built-in testing tools  | Manual testing needed     |
+| **Maintenance**      | Low (community updates) | High (all bugs on us)     |
+| **Performance**      | Optimized (~0.5ms)      | Depends on implementation |
+| **Audit**            | Built-in with adapters  | Need to build             |
+| **Role hierarchies** | Native support          | Complex to implement      |
+| **Multi-tenancy**    | Domain support          | Complex to implement      |
 
 **Winner**: ✅ **Casbin** - Saves development time, more reliable, better tested
 
 ### 4.2 Casbin vs OPA (Open Policy Agent)
 
-| Aspect | Casbin | OPA |
-|--------|--------|-----|
-| **Language** | Golang native | Rego (custom language) |
-| **Learning curve** | Low | High (Rego syntax) |
-| **Performance** | Fast (~0.5ms) | Very fast (~0.3ms) |
-| **Deployment** | Library (in-process) | Separate service |
-| **Complexity** | Simple for RBAC | Overkill for basic RBAC |
-| **Use case** | App-level auth | Infrastructure/K8s policies |
+| Aspect             | Casbin               | OPA                         |
+| ------------------ | -------------------- | --------------------------- |
+| **Language**       | Golang native        | Rego (custom language)      |
+| **Learning curve** | Low                  | High (Rego syntax)          |
+| **Performance**    | Fast (~0.5ms)        | Very fast (~0.3ms)          |
+| **Deployment**     | Library (in-process) | Separate service            |
+| **Complexity**     | Simple for RBAC      | Overkill for basic RBAC     |
+| **Use case**       | App-level auth       | Infrastructure/K8s policies |
 
 **Winner for Precium**: ✅ **Casbin** - Simpler, native Golang, no extra service
 
 ### 4.3 Casbin vs Database-only RBAC
 
-| Aspect | Casbin | Database Only |
-|--------|--------|---------------|
-| **Performance** | In-memory cache | Database queries |
-| **Latency** | ~0.5ms | ~10-50ms |
-| **Flexibility** | Policy language | SQL queries |
-| **Testing** | Easy to test rules | Test through DB |
-| **Version control** | Policies in config | Migrations only |
-| **Scalability** | Excellent | DB bottleneck |
+| Aspect              | Casbin             | Database Only    |
+| ------------------- | ------------------ | ---------------- |
+| **Performance**     | In-memory cache    | Database queries |
+| **Latency**         | ~0.5ms             | ~10-50ms         |
+| **Flexibility**     | Policy language    | SQL queries      |
+| **Testing**         | Easy to test rules | Test through DB  |
+| **Version control** | Policies in config | Migrations only  |
+| **Scalability**     | Excellent          | DB bottleneck    |
 
 **Winner**: ✅ **Casbin** - 10-100x faster, easier to maintain
 
@@ -371,6 +373,7 @@ func SetupStoreRoutes(app *fiber.App) {
 ## 5. Implementation Timeline
 
 ### Phase 1: Iteration 1 (Week 3-4)
+
 - Install Casbin and PostgreSQL adapter
 - Define basic RBAC model
 - Implement user roles: user, premium_user, pro_user, admin
@@ -378,17 +381,20 @@ func SetupStoreRoutes(app *fiber.App) {
 - Add authorization to auth endpoints
 
 ### Phase 2: Iteration 2 (Week 1-2)
+
 - Implement resource ownership checks
 - Add shopping list permissions
 - Add store owner permissions
 - Create subscription tier middleware
 
 ### Phase 3: Iteration 3 (Week 3)
+
 - Add moderator role and permissions
 - Implement price approval workflow
 - Add audit logging for authorization decisions
 
 ### Phase 4: Future Iterations
+
 - Migrate to ABAC for complex scenarios
 - Add department-based permissions (B2B)
 - Implement time-based access control
@@ -445,12 +451,12 @@ func SetupStoreRoutes(app *fiber.App) {
 
 ### 8.1 Development Cost
 
-| Task | Custom RBAC | Casbin |
-|------|-------------|--------|
-| Initial implementation | 40-80 hours | 8-16 hours |
-| Testing | 20 hours | 8 hours |
-| Maintenance (yearly) | 40 hours | 10 hours |
-| **Total Year 1** | **100-140 hours** | **26-34 hours** |
+| Task                   | Custom RBAC       | Casbin          |
+| ---------------------- | ----------------- | --------------- |
+| Initial implementation | 40-80 hours       | 8-16 hours      |
+| Testing                | 20 hours          | 8 hours         |
+| Maintenance (yearly)   | 40 hours          | 10 hours        |
+| **Total Year 1**       | **100-140 hours** | **26-34 hours** |
 
 **Savings**: ~70-100 hours (~$7K-15K in developer time)
 
@@ -480,6 +486,7 @@ If we start with basic role checks in code and later need Casbin:
 ### 9.2 If We Use Casbin from Start
 
 Benefits of early adoption:
+
 - No migration cost later
 - Consistent authorization approach
 - Easier to add new permissions
@@ -529,4 +536,3 @@ Benefits of early adoption:
 ---
 
 **Conclusion**: Casbin is strongly recommended for Precium. It provides production-ready authorization with minimal development effort, perfect fit with our Golang backend, and scales from simple RBAC to complex ABAC as we grow.
-

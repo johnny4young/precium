@@ -72,18 +72,19 @@ type ErrorDetail struct {
 
 // Example:
 {
-  "error": {
-    "code": "VALIDATION_ERROR",
-    "message": "Invalid coordinates provided",
-    "details": {
-      "latitude": "Must be between -90 and 90"
-    },
-    "timestamp": "2026-02-08T15:12:21.715Z",
-    "path": "/api/v1/search/stores",
-    "requestId": "req_abc123"
-  }
+"error": {
+"code": "VALIDATION_ERROR",
+"message": "Invalid coordinates provided",
+"details": {
+"latitude": "Must be between -90 and 90"
+},
+"timestamp": "2026-02-08T15:12:21.715Z",
+"path": "/api/v1/search/stores",
+"requestId": "req_abc123"
 }
-```
+}
+
+````
 
 ## Authentication API
 
@@ -97,24 +98,27 @@ Register a new user with email/password.
   password: string;     // Min 8 chars, 1 uppercase, 1 number
   name: string;         // User's display name
 }
-```
+````
 
 **Response**: `201 Created`
+
 ```typescript
 {
   user: User;
   tokens: {
-    accessToken: string;   // JWT, expires in 15 min
-    refreshToken: string;  // Expires in 7 days
-    expiresIn: number;     // Seconds until expiry
-  };
+    accessToken: string; // JWT, expires in 15 min
+    refreshToken: string; // Expires in 7 days
+    expiresIn: number; // Seconds until expiry
+  }
 }
 ```
 
 ### POST /auth/login
+
 Login with email/password.
 
 **Request**:
+
 ```typescript
 {
   email: string;
@@ -123,6 +127,7 @@ Login with email/password.
 ```
 
 **Response**: `200 OK`
+
 ```typescript
 {
   user: User;
@@ -130,19 +135,22 @@ Login with email/password.
     accessToken: string;
     refreshToken: string;
     expiresIn: number;
-  };
+  }
 }
 ```
 
 ### GET /auth/google
+
 Redirect to Google OAuth.
 
 **Response**: `302 Redirect` to Google
 
 ### GET /auth/google/callback
+
 OAuth callback from Google.
 
 **Query Params**:
+
 ```typescript
 {
   code: string;    // OAuth authorization code
@@ -153,9 +161,11 @@ OAuth callback from Google.
 **Response**: `302 Redirect` to frontend with tokens in URL or cookies
 
 ### POST /auth/refresh
+
 Refresh access token.
 
 **Request**:
+
 ```typescript
 {
   refreshToken: string;
@@ -163,6 +173,7 @@ Refresh access token.
 ```
 
 **Response**: `200 OK`
+
 ```typescript
 {
   accessToken: string;
@@ -172,11 +183,13 @@ Refresh access token.
 ```
 
 ### GET /auth/me
+
 Get current user info.
 
 **Headers**: `Authorization: Bearer <token>`
 
 **Response**: `200 OK`
+
 ```typescript
 {
   user: User;
@@ -184,6 +197,7 @@ Get current user info.
 ```
 
 ### POST /auth/logout
+
 Logout and invalidate tokens.
 
 **Headers**: `Authorization: Bearer <token>`
@@ -193,9 +207,11 @@ Logout and invalidate tokens.
 ## Search API
 
 ### GET /search/products
+
 Search for products by name and location.
 
 **Query Parameters**:
+
 ```typescript
 {
   q: string;             // Search query
@@ -212,6 +228,7 @@ Search for products by name and location.
 ```
 
 **Response**: `200 OK`
+
 ```typescript
 {
   data: Array<{
@@ -219,7 +236,7 @@ Search for products by name and location.
     stores: Array<{
       store: Store;
       price: Price;
-      distance: number;      // meters
+      distance: number; // meters
       promotion?: Promotion;
     }>;
   }>;
@@ -228,9 +245,11 @@ Search for products by name and location.
 ```
 
 ### GET /search/stores
+
 Find stores near location.
 
 **Query Parameters**:
+
 ```typescript
 {
   lat: number;
@@ -244,11 +263,12 @@ Find stores near location.
 ```
 
 **Response**: `200 OK`
+
 ```typescript
 {
   data: Array<{
     store: Store;
-    distance: number;      // meters
+    distance: number; // meters
     productCount?: number; // If hasProduct specified
   }>;
   pagination: PaginationInfo;
@@ -256,16 +276,19 @@ Find stores near location.
 ```
 
 ### GET /search/products/:productId/stores
+
 Find stores selling a specific product.
 
 **Path Parameters**:
+
 ```typescript
 {
-  productId: string;  // UUID
+  productId: string; // UUID
 }
 ```
 
 **Query Parameters**:
+
 ```typescript
 {
   lat: number;
@@ -278,6 +301,7 @@ Find stores selling a specific product.
 ```
 
 **Response**: `200 OK`
+
 ```typescript
 {
   product: Product;
@@ -294,9 +318,11 @@ Find stores selling a specific product.
 ## Products API
 
 ### GET /products
+
 List all products.
 
 **Query Parameters**:
+
 ```typescript
 {
   category?: string;
@@ -308,6 +334,7 @@ List all products.
 ```
 
 **Response**: `200 OK`
+
 ```typescript
 {
   data: Product[];
@@ -316,9 +343,11 @@ List all products.
 ```
 
 ### GET /products/:id
+
 Get product details.
 
 **Response**: `200 OK`
+
 ```typescript
 {
   product: Product;
@@ -332,11 +361,13 @@ Get product details.
 ```
 
 ### POST /products
+
 Create a new product (Admin only).
 
 **Headers**: `Authorization: Bearer <token>`
 
 **Request**:
+
 ```typescript
 {
   name: string;
@@ -350,6 +381,7 @@ Create a new product (Admin only).
 ```
 
 **Response**: `201 Created`
+
 ```typescript
 {
   product: Product;
@@ -357,11 +389,13 @@ Create a new product (Admin only).
 ```
 
 ### PUT /products/:id
+
 Update product (Admin only).
 
 **Request**: Same as POST
 
 **Response**: `200 OK`
+
 ```typescript
 {
   product: Product;
@@ -371,9 +405,11 @@ Update product (Admin only).
 ## Stores API
 
 ### GET /stores
+
 List stores.
 
 **Query Parameters**:
+
 ```typescript
 {
   chain?: string;
@@ -384,6 +420,7 @@ List stores.
 ```
 
 **Response**: `200 OK`
+
 ```typescript
 {
   data: Store[];
@@ -392,9 +429,11 @@ List stores.
 ```
 
 ### GET /stores/:id
+
 Get store details.
 
 **Response**: `200 OK`
+
 ```typescript
 {
   store: Store;
@@ -404,9 +443,11 @@ Get store details.
 ```
 
 ### GET /stores/:id/products
+
 Get products available at store.
 
 **Query Parameters**:
+
 ```typescript
 {
   category?: string;
@@ -417,6 +458,7 @@ Get products available at store.
 ```
 
 **Response**: `200 OK`
+
 ```typescript
 {
   store: Store;
@@ -430,9 +472,11 @@ Get products available at store.
 ```
 
 ### POST /stores
+
 Create store (Admin only).
 
 **Request**:
+
 ```typescript
 {
   name: string;
@@ -456,6 +500,7 @@ Create store (Admin only).
 ```
 
 **Response**: `201 Created`
+
 ```typescript
 {
   store: Store;
@@ -465,9 +510,11 @@ Create store (Admin only).
 ## Prices API
 
 ### GET /prices/product/:productId/store/:storeId
+
 Get current price for product at store.
 
 **Response**: `200 OK`
+
 ```typescript
 {
   price: Price;
@@ -479,9 +526,11 @@ Get current price for product at store.
 ```
 
 ### GET /prices/product/:productId/history
+
 Get price history for product across all stores.
 
 **Query Parameters**:
+
 ```typescript
 {
   startDate?: string;  // ISO 8601
@@ -491,6 +540,7 @@ Get price history for product across all stores.
 ```
 
 **Response**: `200 OK`
+
 ```typescript
 {
   product: Product;
@@ -506,9 +556,11 @@ Get price history for product across all stores.
 ```
 
 ### POST /prices
+
 Create/update price (Authenticated).
 
 **Request**:
+
 ```typescript
 {
   productId: string;
@@ -521,17 +573,20 @@ Create/update price (Authenticated).
 ```
 
 **Response**: `201 Created`
+
 ```typescript
 {
   price: Price;
-  verified: boolean;  // Auto-verify if admin, else pending
+  verified: boolean; // Auto-verify if admin, else pending
 }
 ```
 
 ### GET /prices/trends
+
 Get price trends.
 
 **Query Parameters**:
+
 ```typescript
 {
   productId?: string;
@@ -542,6 +597,7 @@ Get price trends.
 ```
 
 **Response**: `200 OK`
+
 ```typescript
 {
   trends: Array<{
@@ -557,9 +613,11 @@ Get price trends.
 ## Route Optimization API
 
 ### POST /routes/optimize
+
 Calculate optimal shopping route.
 
 **Request**:
+
 ```typescript
 {
   userLocation: Coordinates;
@@ -575,6 +633,7 @@ Calculate optimal shopping route.
 ```
 
 **Response**: `200 OK`
+
 ```typescript
 {
   route: {
@@ -606,9 +665,11 @@ Calculate optimal shopping route.
 ```
 
 ### GET /routes/:id
+
 Get saved route details.
 
 **Response**: `200 OK`
+
 ```typescript
 {
   route: SavedRoute;
@@ -616,9 +677,11 @@ Get saved route details.
 ```
 
 ### GET /routes/:id/navigation
+
 Get turn-by-turn navigation.
 
 **Response**: `200 OK`
+
 ```typescript
 {
   route: SavedRoute;
@@ -630,18 +693,20 @@ Get turn-by-turn navigation.
       duration: number;
       maneuver: string;
     }>;
-  };
+  }
 }
 ```
 
 ## Shopping Lists API
 
 ### GET /shopping-lists
+
 Get user's shopping lists.
 
 **Headers**: `Authorization: Bearer <token>`
 
 **Response**: `200 OK`
+
 ```typescript
 {
   data: ShoppingList[];
@@ -649,9 +714,11 @@ Get user's shopping lists.
 ```
 
 ### GET /shopping-lists/:id
+
 Get shopping list details.
 
 **Response**: `200 OK`
+
 ```typescript
 {
   list: ShoppingList;
@@ -665,9 +732,11 @@ Get shopping list details.
 ```
 
 ### POST /shopping-lists
+
 Create shopping list.
 
 **Request**:
+
 ```typescript
 {
   name: string;
@@ -681,6 +750,7 @@ Create shopping list.
 ```
 
 **Response**: `201 Created`
+
 ```typescript
 {
   list: ShoppingList;
@@ -688,11 +758,13 @@ Create shopping list.
 ```
 
 ### PUT /shopping-lists/:id
+
 Update shopping list.
 
 **Request**: Same as POST
 
 **Response**: `200 OK`
+
 ```typescript
 {
   list: ShoppingList;
@@ -700,9 +772,11 @@ Update shopping list.
 ```
 
 ### POST /shopping-lists/:id/items
+
 Add item to list.
 
 **Request**:
+
 ```typescript
 {
   productId?: string;
@@ -713,6 +787,7 @@ Add item to list.
 ```
 
 **Response**: `201 Created`
+
 ```typescript
 {
   item: ShoppingListItem;
@@ -720,9 +795,11 @@ Add item to list.
 ```
 
 ### PUT /shopping-lists/:listId/items/:itemId
+
 Update list item.
 
 **Request**:
+
 ```typescript
 {
   quantity?: number;
@@ -731,6 +808,7 @@ Update list item.
 ```
 
 **Response**: `200 OK`
+
 ```typescript
 {
   item: ShoppingListItem;
@@ -738,6 +816,7 @@ Update list item.
 ```
 
 ### DELETE /shopping-lists/:listId/items/:itemId
+
 Remove item from list.
 
 **Response**: `204 No Content`
@@ -745,13 +824,16 @@ Remove item from list.
 ## OCR (Receipt Scanning) API
 
 ### POST /ocr/upload
+
 Upload receipt image for processing.
 
-**Headers**: 
+**Headers**:
+
 - `Authorization: Bearer <token>`
 - `Content-Type: multipart/form-data`
 
 **Request**:
+
 ```typescript
 {
   image: File;           // Image file
@@ -761,6 +843,7 @@ Upload receipt image for processing.
 ```
 
 **Response**: `202 Accepted`
+
 ```typescript
 {
   job: {
@@ -768,14 +851,16 @@ Upload receipt image for processing.
     status: 'pending' | 'processing' | 'completed' | 'failed';
     imageUrl: string;
     createdAt: string;
-  };
+  }
 }
 ```
 
 ### GET /ocr/jobs/:id
+
 Get OCR job status and results.
 
 **Response**: `200 OK`
+
 ```typescript
 {
   job: {
@@ -806,9 +891,11 @@ Get OCR job status and results.
 ```
 
 ### POST /ocr/jobs/:id/review
+
 Review and approve OCR results.
 
 **Request**:
+
 ```typescript
 {
   items: Array<{
@@ -824,6 +911,7 @@ Review and approve OCR results.
 ```
 
 **Response**: `200 OK`
+
 ```typescript
 {
   approved: number;
@@ -834,9 +922,11 @@ Review and approve OCR results.
 ```
 
 ### GET /ocr/pending
+
 Get pending OCR reviews (Admin/Moderator).
 
 **Query Parameters**:
+
 ```typescript
 {
   page?: number;
@@ -845,6 +935,7 @@ Get pending OCR reviews (Admin/Moderator).
 ```
 
 **Response**: `200 OK`
+
 ```typescript
 {
   data: OcrJob[];
@@ -855,9 +946,11 @@ Get pending OCR reviews (Admin/Moderator).
 ## Promotions API
 
 ### GET /promotions
+
 Get active promotions.
 
 **Query Parameters**:
+
 ```typescript
 {
   lat?: number;
@@ -872,22 +965,25 @@ Get active promotions.
 ```
 
 **Response**: `200 OK`
+
 ```typescript
 {
   data: Array<{
     promotion: Promotion;
     product: Product;
     store: Store;
-    distance?: number;  // If location provided
+    distance?: number; // If location provided
   }>;
   pagination: PaginationInfo;
 }
 ```
 
 ### GET /promotions/:id
+
 Get promotion details.
 
 **Response**: `200 OK`
+
 ```typescript
 {
   promotion: Promotion;
@@ -899,6 +995,7 @@ Get promotion details.
 ## Data Models
 
 ### User
+
 ```go
 type User struct {
     ID         string    `json:"id" db:"id"`                      // UUID
@@ -914,6 +1011,7 @@ type User struct {
 ```
 
 ### Store
+
 ```go
 type OperatingHours map[string]DayHours
 
@@ -943,6 +1041,7 @@ type Store struct {
 ```
 
 ### Product
+
 ```go
 type Product struct {
     ID          string    `json:"id" db:"id"`
@@ -960,6 +1059,7 @@ type Product struct {
 ```
 
 ### Price
+
 ```go
 type StockStatus string
 
@@ -997,6 +1097,7 @@ type Price struct {
 ```
 
 ### Promotion
+
 ```go
 type DiscountType string
 
@@ -1026,6 +1127,7 @@ type Promotion struct {
 ```
 
 ### ShoppingList
+
 ```go
 type ShoppingList struct {
     ID        string    `json:"id" db:"id"`
@@ -1037,6 +1139,7 @@ type ShoppingList struct {
 ```
 
 ### ShoppingListItem
+
 ```go
 type ShoppingListItem struct {
     ID          string    `json:"id" db:"id"`
@@ -1052,6 +1155,7 @@ type ShoppingListItem struct {
 ```
 
 ### Category
+
 ```go
 type Category struct {
     ID        string    `json:"id" db:"id"`
@@ -1066,20 +1170,20 @@ type Category struct {
 
 ## HTTP Status Codes
 
-| Code | Meaning | Usage |
-|------|---------|-------|
-| 200 | OK | Successful GET/PUT request |
-| 201 | Created | Successful POST creating resource |
-| 204 | No Content | Successful DELETE |
-| 400 | Bad Request | Invalid request data |
-| 401 | Unauthorized | Missing or invalid token |
-| 403 | Forbidden | Insufficient permissions |
-| 404 | Not Found | Resource doesn't exist |
-| 409 | Conflict | Resource already exists |
-| 422 | Unprocessable Entity | Validation error |
-| 429 | Too Many Requests | Rate limit exceeded |
-| 500 | Internal Server Error | Server error |
-| 503 | Service Unavailable | Maintenance mode |
+| Code | Meaning               | Usage                             |
+| ---- | --------------------- | --------------------------------- |
+| 200  | OK                    | Successful GET/PUT request        |
+| 201  | Created               | Successful POST creating resource |
+| 204  | No Content            | Successful DELETE                 |
+| 400  | Bad Request           | Invalid request data              |
+| 401  | Unauthorized          | Missing or invalid token          |
+| 403  | Forbidden             | Insufficient permissions          |
+| 404  | Not Found             | Resource doesn't exist            |
+| 409  | Conflict              | Resource already exists           |
+| 422  | Unprocessable Entity  | Validation error                  |
+| 429  | Too Many Requests     | Rate limit exceeded               |
+| 500  | Internal Server Error | Server error                      |
+| 503  | Service Unavailable   | Maintenance mode                  |
 
 ## Rate Limiting
 
@@ -1096,10 +1200,10 @@ import (
 var RateLimits = struct {
     // Per IP address (anonymous users)
     Anonymous limiter.Config
-    
+
     // Per authenticated user
     Authenticated limiter.Config
-    
+
     // Specific endpoints
     OCRUpload       limiter.Config
     RouteOptimize   limiter.Config

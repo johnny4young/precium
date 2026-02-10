@@ -27,30 +27,30 @@ This guide explains how to deploy the Precium PostgreSQL database to Supabase, a
 
 ### Benefits for Precium
 
-| Feature | Benefit |
-|---------|---------|
-| **PostgreSQL 17+** | Latest features, performance improvements |
-| **PostGIS Support** | Built-in spatial queries for location-based features |
-| **pg_trgm Extension** | Fuzzy search support (Spanish typos) |
-| **Automatic Backups** | Daily backups with point-in-time recovery |
-| **Connection Pooling** | Built-in PgBouncer for efficient connections |
-| **Real-time** | Optional WebSocket support for live updates |
-| **Free Tier** | 500MB database, 2GB bandwidth, unlimited API requests |
-| **Global CDN** | Edge functions for low-latency API responses |
-| **Dashboard** | Web-based SQL editor and table viewer |
-| **CLI Tools** | Migration management and local development |
+| Feature                | Benefit                                               |
+| ---------------------- | ----------------------------------------------------- |
+| **PostgreSQL 17+**     | Latest features, performance improvements             |
+| **PostGIS Support**    | Built-in spatial queries for location-based features  |
+| **pg_trgm Extension**  | Fuzzy search support (Spanish typos)                  |
+| **Automatic Backups**  | Daily backups with point-in-time recovery             |
+| **Connection Pooling** | Built-in PgBouncer for efficient connections          |
+| **Real-time**          | Optional WebSocket support for live updates           |
+| **Free Tier**          | 500MB database, 2GB bandwidth, unlimited API requests |
+| **Global CDN**         | Edge functions for low-latency API responses          |
+| **Dashboard**          | Web-based SQL editor and table viewer                 |
+| **CLI Tools**          | Migration management and local development            |
 
 ### Comparison with Alternatives
 
-| Feature | Supabase | AWS RDS | Google Cloud SQL | Neon |
-|---------|----------|---------|------------------|------|
-| **PostgreSQL 17** | ✅ Yes | ✅ Yes | ✅ Yes | ✅ Yes |
-| **PostGIS** | ✅ Yes | ✅ Yes | ✅ Yes | ✅ Yes |
-| **Free Tier** | ✅ 500MB | ❌ No | ❌ No | ✅ 3GB |
-| **Auto-scaling** | ⚠️ Manual | ✅ Yes | ✅ Yes | ✅ Yes |
-| **Setup Time** | ~5 min | ~15 min | ~15 min | ~5 min |
-| **Monthly Cost (Start)** | $0-25 | $30+ | $35+ | $0-19 |
-| **Best For** | MVP/Early | Production | Enterprise | Serverless |
+| Feature                  | Supabase  | AWS RDS    | Google Cloud SQL | Neon       |
+| ------------------------ | --------- | ---------- | ---------------- | ---------- |
+| **PostgreSQL 17**        | ✅ Yes    | ✅ Yes     | ✅ Yes           | ✅ Yes     |
+| **PostGIS**              | ✅ Yes    | ✅ Yes     | ✅ Yes           | ✅ Yes     |
+| **Free Tier**            | ✅ 500MB  | ❌ No      | ❌ No            | ✅ 3GB     |
+| **Auto-scaling**         | ⚠️ Manual | ✅ Yes     | ✅ Yes           | ✅ Yes     |
+| **Setup Time**           | ~5 min    | ~15 min    | ~15 min          | ~5 min     |
+| **Monthly Cost (Start)** | $0-25     | $30+       | $35+             | $0-19      |
+| **Best For**             | MVP/Early | Production | Enterprise       | Serverless |
 
 **Recommendation for Precium**: Start with Supabase free tier, upgrade to Pro ($25/mo) when database > 500MB or connections > 60.
 
@@ -99,6 +99,7 @@ sudo apt-get install postgresql-client-17
 ### Step 1: Create Supabase Project
 
 1. **Via Web Dashboard**:
+
    ```
    1. Go to https://app.supabase.com
    2. Click "New Project"
@@ -409,7 +410,7 @@ CREATE EXTENSION IF NOT EXISTS postgis;
 CREATE EXTENSION IF NOT EXISTS postgis_topology;
 
 -- Add location column to stores table
-ALTER TABLE stores 
+ALTER TABLE stores
 ADD COLUMN location GEOGRAPHY(POINT, 4326);
 
 -- Create spatial index for fast location queries
@@ -442,7 +443,7 @@ CREATE OR REPLACE FUNCTION find_nearby_stores(
 ) AS $$
 BEGIN
     RETURN QUERY
-    SELECT 
+    SELECT
         s.id,
         s.name,
         ST_Distance(
@@ -493,13 +494,13 @@ CREATE EXTENSION IF NOT EXISTS pg_trgm;
 CREATE EXTENSION IF NOT EXISTS unaccent;
 
 -- Create GIN index for fuzzy search on product names
-CREATE INDEX idx_products_name_trgm ON products 
-USING GIN (name gin_trgm_ops) 
+CREATE INDEX idx_products_name_trgm ON products
+USING GIN (name gin_trgm_ops)
 WHERE deleted_at IS NULL;
 
 -- Create GIN index for fuzzy search on product brands
-CREATE INDEX idx_products_brand_trgm ON products 
-USING GIN (brand gin_trgm_ops) 
+CREATE INDEX idx_products_brand_trgm ON products
+USING GIN (brand gin_trgm_ops)
 WHERE deleted_at IS NULL AND brand IS NOT NULL;
 
 -- Create function for fuzzy product search
@@ -514,7 +515,7 @@ CREATE OR REPLACE FUNCTION fuzzy_search_products(
 ) AS $$
 BEGIN
     RETURN QUERY
-    SELECT 
+    SELECT
         p.id,
         p.name,
         SIMILARITY(unaccent(p.name), unaccent(search_term)) as score
@@ -565,7 +566,7 @@ import (
     "context"
     "fmt"
     "time"
-    
+
     "github.com/jackc/pgx/v5/pgxpool"
     "github.com/rs/zerolog/log"
 )
@@ -595,39 +596,39 @@ func NewSupabasePool(cfg *SupabaseConfig) (*pgxpool.Pool, error) {
         cfg.Database,
         cfg.PoolMaxConns,
     )
-    
+
     poolConfig, err := pgxpool.ParseConfig(connString)
     if err != nil {
         return nil, fmt.Errorf("unable to parse config: %w", err)
     }
-    
+
     // Configure connection pool
     poolConfig.MaxConns = cfg.PoolMaxConns
     poolConfig.MinConns = cfg.PoolMinConns
     poolConfig.MaxConnIdleTime = cfg.PoolMaxIdleTime
     poolConfig.MaxConnLifetime = cfg.ConnMaxLifetime
     poolConfig.HealthCheckPeriod = 1 * time.Minute
-    
+
     // Create pool
     pool, err := pgxpool.NewWithConfig(context.Background(), poolConfig)
     if err != nil {
         return nil, fmt.Errorf("unable to create connection pool: %w", err)
     }
-    
+
     // Test connection
     ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
     defer cancel()
-    
+
     if err := pool.Ping(ctx); err != nil {
         return nil, fmt.Errorf("unable to ping database: %w", err)
     }
-    
+
     log.Info().
         Str("host", cfg.Host).
         Int("port", cfg.Port).
         Int32("max_conns", cfg.PoolMaxConns).
         Msg("Successfully connected to Supabase")
-    
+
     return pool, nil
 }
 ```
@@ -675,7 +676,7 @@ import (
     "os"
     "strconv"
     "time"
-    
+
     "github.com/joho/godotenv"
     "precium/internal/database"
 )
@@ -685,7 +686,7 @@ func main() {
     if err := godotenv.Load(); err != nil {
         log.Warn().Msg("No .env file found, using environment variables")
     }
-    
+
     // Parse configuration
     cfg := &database.SupabaseConfig{
         Host:            os.Getenv("DB_HOST"),
@@ -698,14 +699,14 @@ func main() {
         PoolMaxIdleTime: parseDuration(os.Getenv("DB_POOL_MAX_IDLE_TIME"), 10*time.Minute),
         ConnMaxLifetime: parseDuration(os.Getenv("DB_CONN_MAX_LIFETIME"), 1*time.Hour),
     }
-    
+
     // Create database pool
     pool, err := database.NewSupabasePool(cfg)
     if err != nil {
         log.Fatal().Err(err).Msg("Failed to connect to database")
     }
     defer pool.Close()
-    
+
     // ... rest of application setup
 }
 ```
@@ -762,6 +763,7 @@ postgresql://postgres.xxxxx:[PASSWORD]@aws-0-us-east-1.pooler.supabase.com:6543/
 ```
 
 Benefits:
+
 - Reduces connection overhead
 - Handles connection spikes
 - Better resource utilization
@@ -780,8 +782,8 @@ ANALYZE products;
 ANALYZE prices;
 
 -- Check slow queries (Pro plan)
-SELECT * FROM pg_stat_statements 
-ORDER BY total_exec_time DESC 
+SELECT * FROM pg_stat_statements
+ORDER BY total_exec_time DESC
 LIMIT 10;
 ```
 
@@ -789,16 +791,16 @@ LIMIT 10;
 
 ```yaml
 # sqlc.yaml
-version: "2"
+version: '2'
 sql:
-  - engine: "postgresql"
-    queries: "internal/database/queries"
-    schema: "internal/database/schema"
+  - engine: 'postgresql'
+    queries: 'internal/database/queries'
+    schema: 'internal/database/schema'
     gen:
       go:
-        package: "db"
-        out: "internal/database/sqlc"
-        sql_package: "pgx/v5"
+        package: 'db'
+        out: 'internal/database/sqlc'
+        sql_package: 'pgx/v5'
         emit_json_tags: true
         emit_db_tags: true
         emit_interface: true
@@ -881,7 +883,7 @@ SELECT count(*) FROM pg_stat_activity;
 SELECT pg_size_pretty(pg_database_size('postgres'));
 
 -- Table sizes
-SELECT 
+SELECT
     schemaname,
     tablename,
     pg_size_pretty(pg_total_relation_size(schemaname||'.'||tablename)) AS size
@@ -890,7 +892,7 @@ WHERE schemaname = 'public'
 ORDER BY pg_total_relation_size(schemaname||'.'||tablename) DESC;
 
 -- Slow queries (requires pg_stat_statements)
-SELECT 
+SELECT
     query,
     calls,
     mean_exec_time,
@@ -903,6 +905,7 @@ LIMIT 10;
 ### Alerts
 
 Set up alerts in Supabase Dashboard:
+
 - Database size > 80% of quota
 - Connection count > 80% of limit
 - High query latency
@@ -913,25 +916,26 @@ Set up alerts in Supabase Dashboard:
 
 ### Supabase Pricing Tiers
 
-| Feature | Free | Pro | Team | Enterprise |
-|---------|------|-----|------|------------|
-| **Price** | $0/mo | $25/mo | $599/mo | Custom |
-| **Database Size** | 500 MB | 8 GB | Unlimited | Unlimited |
-| **Bandwidth** | 2 GB | 50 GB | 250 GB | Custom |
-| **Monthly Active Users** | Unlimited | Unlimited | Unlimited | Unlimited |
-| **Backups** | 7 days | 30 days + PITR | 90 days + PITR | Custom |
-| **Support** | Community | Email | Priority | Dedicated |
+| Feature                  | Free      | Pro            | Team           | Enterprise |
+| ------------------------ | --------- | -------------- | -------------- | ---------- |
+| **Price**                | $0/mo     | $25/mo         | $599/mo        | Custom     |
+| **Database Size**        | 500 MB    | 8 GB           | Unlimited      | Unlimited  |
+| **Bandwidth**            | 2 GB      | 50 GB          | 250 GB         | Custom     |
+| **Monthly Active Users** | Unlimited | Unlimited      | Unlimited      | Unlimited  |
+| **Backups**              | 7 days    | 30 days + PITR | 90 days + PITR | Custom     |
+| **Support**              | Community | Email          | Priority       | Dedicated  |
 
 ### Precium Cost Projection
 
-| Phase | Database Size | Monthly Cost | Tier |
-|-------|--------------|--------------|------|
-| **MVP (0-1K users)** | <500 MB | $0 | Free |
-| **Growth (1-10K users)** | 2-5 GB | $25 | Pro |
-| **Scale (10-50K users)** | 10-20 GB | $25-50 | Pro + Storage |
-| **Enterprise (50K+ users)** | 50+ GB | Custom | Enterprise |
+| Phase                       | Database Size | Monthly Cost | Tier          |
+| --------------------------- | ------------- | ------------ | ------------- |
+| **MVP (0-1K users)**        | <500 MB       | $0           | Free          |
+| **Growth (1-10K users)**    | 2-5 GB        | $25          | Pro           |
+| **Scale (10-50K users)**    | 10-20 GB      | $25-50       | Pro + Storage |
+| **Enterprise (50K+ users)** | 50+ GB        | Custom       | Enterprise    |
 
 **Recommendation**: Start with Free tier, upgrade to Pro when:
+
 - Database size > 400 MB (80% of free tier)
 - Need Point-in-Time Recovery
 - Need priority support
@@ -950,6 +954,7 @@ Error: connection timeout
 ```
 
 **Solution**:
+
 - Use connection pooler URL (port 6543)
 - Increase connection timeout in your app
 - Check firewall/network settings
@@ -961,6 +966,7 @@ Error: sorry, too many clients already
 ```
 
 **Solution**:
+
 - Use connection pooler (port 6543 instead of 5432)
 - Reduce `DB_POOL_MAX_CONNS`
 - Upgrade to Pro tier (more connections)
@@ -972,6 +978,7 @@ Error: type "geography" does not exist
 ```
 
 **Solution**:
+
 ```sql
 -- Enable PostGIS
 CREATE EXTENSION IF NOT EXISTS postgis;
@@ -987,6 +994,7 @@ Error: relation "products" already exists
 ```
 
 **Solution**:
+
 ```bash
 # Check migration version
 migrate -path backend/migrations -database "${DATABASE_URL}" version

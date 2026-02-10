@@ -11,6 +11,7 @@ To create the most user-friendly and accurate price comparison platform that sav
 ## Key Features
 
 ### Core Functionality
+
 1. **Location-Based Product Search** - Find products in nearby stores using GPS
 2. **Smart Price Comparison** - Real-time price analysis across multiple retailers
 3. **Advanced Fuzzy Search** - Typo-tolerant search supporting Spanish language variations (huevos, huebos, uevos)
@@ -22,6 +23,7 @@ To create the most user-friendly and accurate price comparison platform that sav
 9. **Monetization Features** - Freemium model with subscriptions, ads, and store promotions
 
 ### Platform Support
+
 - **Web Application** - Desktop and mobile browsers
 - **iOS Application** - Native mobile experience
 - **Android Application** - Native mobile experience
@@ -30,54 +32,47 @@ To create the most user-friendly and accurate price comparison platform that sav
 
 ### Recommended Architecture
 
-| Component | Technology | Rationale |
-|-----------|-----------|-----------|
-| **Backend** | Golang 1.23+ with Fiber | Exceptional performance, native concurrency, microservices-ready |
-| **Web Frontend** | React + TypeScript + Vite | Industry standard, ultra-fast builds |
-| **Mobile** | React Native + TypeScript | Code sharing, cross-platform |
-| **Database** | PostgreSQL 17 + PostGIS 3.4 + Extensions | Latest version, GIS support, pg_trgm for fuzzy search, unaccent for Spanish |
-| **Query Builder** | SQLC | Type-safe Go code from SQL, perfect for Golang |
-| **Cache** | Redis 7+ | Performance optimization |
-| **Repository** | Monorepo with npm workspaces | Native, simple, no extra tooling |
-| **Build Tool** | Vite 6+ | Lightning-fast frontend builds |
-| **API Gateway** | Traefik (reverse proxy) | Simple, lightweight - no complex gateway needed initially |
-| **Authentication** | Custom Golang OAuth2 + JWT | Lightweight, performant, full control |
-| **CI/CD** | GitHub Actions | Native integration, flexible |
-| **Hosting** | Cloud (AWS/GCP/Azure) | Scalability, managed services |
+| Component          | Technology                               | Rationale                                                                   |
+| ------------------ | ---------------------------------------- | --------------------------------------------------------------------------- |
+| **Backend**        | Golang 1.23+ with Fiber                  | Exceptional performance, native concurrency, microservices-ready            |
+| **Web Frontend**   | React + TypeScript + Vite                | Industry standard, ultra-fast builds                                        |
+| **Mobile**         | React Native + TypeScript                | Code sharing, cross-platform                                                |
+| **Database**       | PostgreSQL 17 + PostGIS 3.4 + Extensions | Latest version, GIS support, pg_trgm for fuzzy search, unaccent for Spanish |
+| **Query Builder**  | SQLC                                     | Type-safe Go code from SQL, perfect for Golang                              |
+| **Cache**          | Redis 7+                                 | Performance optimization                                                    |
+| **Repository**     | Monorepo with npm workspaces             | Native, simple, no extra tooling                                            |
+| **Build Tool**     | Vite 6+                                  | Lightning-fast frontend builds                                              |
+| **API Gateway**    | Traefik (reverse proxy)                  | Simple, lightweight - no complex gateway needed initially                   |
+| **Authentication** | Custom Golang OAuth2 + JWT               | Lightweight, performant, full control                                       |
+| **CI/CD**          | GitHub Actions                           | Native integration, flexible                                                |
+| **Hosting**        | Cloud (AWS/GCP/Azure)                    | Scalability, managed services                                               |
 
 ### Key Technical Decisions
 
 1. **Golang for Backend**: Exceptional performance (10-100x faster for algorithms), native concurrency with goroutines, perfect for microservices, lower costs
    - Single binary deployment, no dependency hell
    - Built-in concurrency for handling 50K+ concurrent users
-   
 2. **SQLC over ORMs**: Type-safe Go code generated from SQL, no ORM overhead, compile-time query validation
    - Write pure SQL, get type-safe Go code
    - Perfect for Golang projects
-   
 3. **Fuzzy Search with pg_trgm**: PostgreSQL's trigram extension for typo-tolerant search
    - Handles Spanish language variations and typos
    - Fast with GIN indexes, no external dependencies
    - Implemented in Iteration 1
-   
 4. **Simple Architecture (No API Gateway Initially)**: Direct backend with Fiber middleware
    - Traefik as lightweight reverse proxy
    - Add full API Gateway (Kong) only if needed later
    - Reduces complexity for MVP
-   
 5. **Custom Authentication (Not Keycloak)**: Golang OAuth2 + JWT for lightweight auth
    - No JVM overhead, faster performance
    - Full control over auth flow
    - Can migrate to Keycloak later if enterprise features needed
-   
 6. **npm workspaces + Vite over Turborepo**: Native npm feature, simpler for mixed-language monorepos (Go + TypeScript), Vite provides ultra-fast builds
    - No extra dependencies or complex configuration
    - Sufficient for our team size and requirements
-   
 7. **REST over tRPC/GraphQL**: Universal compatibility, simple debugging, HTTP caching
    - tRPC requires TypeScript backend (not compatible with Golang)
    - gRPC reserved for internal service-to-service communication
-   
 8. **Freemium Monetization Model**: Free tier with ads, premium subscriptions, store promotions
    - Multiple revenue streams
    - Scalable business model
@@ -114,18 +109,19 @@ precium/
 
 ### Timeline: 24-30 Weeks (6 Iterations)
 
-| Iteration | Duration | Deliverable | Status |
-|-----------|----------|-------------|--------|
-| **Iteration 1** | 4 weeks | Foundation & Authentication | 🔜 Next |
-| **Iteration 2** | 4 weeks | Core Search Features | 📅 Planned |
-| **Iteration 3** | 5 weeks | Shopping Lists & Prices | 📅 Planned |
-| **Iteration 4** | 5 weeks | Route Optimization | 📅 Planned |
-| **Iteration 5** | 5 weeks | Receipt Scanning (OCR) | 📅 Planned |
-| **Iteration 6** | 5 weeks | Polish & Production Launch | 📅 Planned |
+| Iteration       | Duration | Deliverable                 | Status     |
+| --------------- | -------- | --------------------------- | ---------- |
+| **Iteration 1** | 4 weeks  | Foundation & Authentication | 🔜 Next    |
+| **Iteration 2** | 4 weeks  | Core Search Features        | 📅 Planned |
+| **Iteration 3** | 5 weeks  | Shopping Lists & Prices     | 📅 Planned |
+| **Iteration 4** | 5 weeks  | Route Optimization          | 📅 Planned |
+| **Iteration 5** | 5 weeks  | Receipt Scanning (OCR)      | 📅 Planned |
+| **Iteration 6** | 5 weeks  | Polish & Production Launch  | 📅 Planned |
 
 ### Iteration 1: Foundation & Authentication (Weeks 1-4)
 
 **Week 1**: Project Setup
+
 - Initialize monorepo with npm workspaces
 - Set up Docker Compose for local development
 - Configure PostgreSQL 17 + PostGIS + Redis 7
@@ -135,6 +131,7 @@ precium/
 - Configure Traefik as reverse proxy
 
 **Week 2**: Backend Foundation & Fuzzy Search ⭐ NEW
+
 - Set up Golang + Fiber application structure
 - Configure SQLC for type-safe database queries
 - Implement database migrations with golang-migrate
@@ -146,6 +143,7 @@ precium/
 - Test fuzzy search: "huebos" → "huevos", "uevos" → "huevos"
 
 **Week 3**: Authentication System
+
 - Implement JWT authentication in Golang
 - Use golang-jwt library for token generation
 - Integrate Google OAuth2 (golang.org/x/oauth2)
@@ -155,6 +153,7 @@ precium/
 - Create auth middleware for protected routes
 
 **Week 4**: Frontend Foundation & Search
+
 - Set up React web app with Vite 6
 - Create authentication pages
 - Set up React Native mobile app
@@ -314,12 +313,14 @@ POST   /ocr/jobs/:id/review
 ## Security Considerations
 
 ### Authentication & Authorization
+
 - JWT tokens with short expiry (15 minutes)
 - Refresh tokens for session management
 - OAuth2 for third-party authentication
 - Role-based access control (User, Admin, Moderator)
 
 ### Data Security
+
 - HTTPS/TLS for all communications
 - Database encryption at rest
 - Secure secret management
@@ -330,6 +331,7 @@ POST   /ocr/jobs/:id/review
 - Rate limiting
 
 ### Authorization (Using Casbin)
+
 - **Casbin** for flexible RBAC/ABAC authorization
 - Policy-driven access control (config-based)
 - Role hierarchies: user → premium_user → pro_user → admin
@@ -341,6 +343,7 @@ POST   /ocr/jobs/:id/review
 - See docs/12-CASBIN-AUTHORIZATION-ANALYSIS.md for details
 
 ### Privacy
+
 - GDPR compliance
 - User data anonymization
 - Right to be forgotten
@@ -350,18 +353,21 @@ POST   /ocr/jobs/:id/review
 ## Performance Targets
 
 ### Backend
+
 - API Response Time: < 200ms (p95)
 - Database Query Time: < 50ms (p95)
 - Concurrent Users: 10,000+
 - Uptime: 99.9%
 
 ### Frontend
+
 - First Contentful Paint: < 2s
 - Time to Interactive: < 3s
 - Lighthouse Score: > 90
 - Bundle Size: < 300KB (initial)
 
 ### Mobile
+
 - App Launch Time: < 2s
 - Smooth 60 FPS scrolling
 - Offline capability for key features
@@ -370,12 +376,14 @@ POST   /ocr/jobs/:id/review
 ## Scalability Strategy
 
 ### Horizontal Scaling
+
 - Stateless backend services
 - Load balancer distribution
 - Database read replicas
 - Redis cluster for caching
 
 ### Future Optimization
+
 - Golang microservices for performance-critical paths
 - Elasticsearch for advanced search
 - CDN for static assets
@@ -385,28 +393,27 @@ POST   /ocr/jobs/:id/review
 ## Risk Management
 
 ### Technical Risks
+
 1. **Route Optimization Performance**
    - Mitigation: Approximation algorithms, caching, Golang service if needed
-   
 2. **OCR Accuracy**
    - Mitigation: Google Vision API, community review system
-   
 3. **Database Performance**
    - Mitigation: Proper indexing, caching, query optimization
 
 ### Business Risks
+
 1. **User Adoption**
    - Mitigation: Beta testing, user feedback, iterative improvements
-   
 2. **Data Quality**
    - Mitigation: Verification system, community moderation
-   
 3. **Store Relationships**
    - Mitigation: Focus on user-contributed data, clear terms of service
 
 ## Success Metrics
 
 ### Product Metrics
+
 - Daily Active Users (DAU)
 - Monthly Active Users (MAU)
 - User Retention (Day 1, 7, 30)
@@ -416,6 +423,7 @@ POST   /ocr/jobs/:id/review
 - Price Contributions
 
 ### Technical Metrics
+
 - API Response Times
 - Error Rates
 - Uptime
@@ -424,6 +432,7 @@ POST   /ocr/jobs/:id/review
 - Build Times
 
 ### Business Metrics
+
 - User Acquisition Cost
 - Customer Lifetime Value
 - User Satisfaction Score
@@ -432,10 +441,12 @@ POST   /ocr/jobs/:id/review
 ## Budget Estimates
 
 ### Development (6 months)
+
 - 3-5 Developers
 - Estimated: $150,000 - $300,000
 
 ### Infrastructure (Monthly)
+
 - Cloud Hosting: $100-500
 - Database: $50-200
 - APIs (Maps, Vision): $200-800
@@ -444,6 +455,7 @@ POST   /ocr/jobs/:id/review
 - **Total**: $420-1,650/month
 
 ### Post-Launch (Monthly)
+
 - Scaling costs based on usage
 - Support team
 - Ongoing development
@@ -451,6 +463,7 @@ POST   /ocr/jobs/:id/review
 ## Team Requirements
 
 ### Core Team
+
 - **1 Backend Developer** - Golang expert
 - **1 Frontend Developer** - React specialist
 - **1 Mobile Developer** - React Native expert
@@ -458,6 +471,7 @@ POST   /ocr/jobs/:id/review
 - **0.5 DevOps Engineer** - Infrastructure and CI/CD
 
 ### Extended Team (Future)
+
 - Product Manager
 - UX/UI Designer
 - QA Engineer
@@ -467,6 +481,7 @@ POST   /ocr/jobs/:id/review
 ## Next Steps
 
 ### Immediate Actions (Week 1)
+
 1. ✅ Complete architecture documentation
 2. ✅ Make technology stack decisions
 3. ✅ Define implementation roadmap
@@ -476,6 +491,7 @@ POST   /ocr/jobs/:id/review
 7. 🔜 Begin Iteration 1
 
 ### Stakeholder Decisions Needed
+
 1. **Budget Approval** - Confirm development and infrastructure budget
 2. **Timeline Approval** - Confirm 6-month development timeline
 3. **Team Assembly** - Hire or assign development team

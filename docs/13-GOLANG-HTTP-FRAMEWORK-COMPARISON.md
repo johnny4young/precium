@@ -15,6 +15,7 @@ This document provides a comprehensive comparison of the three leading Golang HT
 **Recommended Framework: Fiber v2.52+**
 
 **Reasoning:**
+
 - **Best Performance**: 10-20% faster than Gin, 30-40% faster than Echo
 - **Express.js-like API**: Easier onboarding for developers with JavaScript background
 - **Active Maintenance**: Regular updates, responsive maintainers, v3 in development
@@ -23,6 +24,7 @@ This document provides a comprehensive comparison of the three leading Golang HT
 - **Large Community**: 32K+ GitHub stars, extensive middleware ecosystem
 
 **Trade-offs:**
+
 - Slightly less mature than Gin (2020 vs 2014)
 - Fasthttp compatibility issues with some standard library tools
 - Breaking changes between major versions (v2 → v3)
@@ -43,6 +45,7 @@ This document provides a comprehensive comparison of the three leading Golang HT
 Fiber is an Express.js-inspired web framework built on top of Fasthttp, the fastest HTTP engine for Go. It's designed for ease of use and performance, with zero memory allocation and extremely fast routing.
 
 **Key Features:**
+
 - Built on Fasthttp (not net/http)
 - Express.js-like API design
 - Zero memory allocations in routing
@@ -70,6 +73,7 @@ Focus on developer experience with familiar Express.js-style API while deliverin
 Echo is a high-performance, extensible, minimalist Go web framework. It uses the standard net/http package and focuses on simplicity, flexibility, and good performance without sacrificing features.
 
 **Key Features:**
+
 - Built on standard net/http
 - Optimized HTTP router
 - Middleware chaining
@@ -97,6 +101,7 @@ Balance between simplicity, flexibility, and performance using standard library 
 Gin is a mature, battle-tested HTTP web framework with a martini-like API. It's one of the most popular Go frameworks, known for its excellent performance, stability, and extensive production usage.
 
 **Key Features:**
+
 - Built on standard net/http with httprouter
 - Radix tree-based routing (very fast)
 - Middleware support
@@ -121,40 +126,40 @@ Provide a fast, stable, production-ready framework with a simple API and minimal
 **Benchmark Setup:** Single route, simple JSON response, 8-core CPU, 100 concurrent connections
 
 | Framework | Requests/sec | Latency (p95) | Memory/Request |
-|-----------|--------------|---------------|----------------|
-| **Fiber** | 840,000 | 0.15ms | 0 bytes |
-| **Gin** | 720,000 | 0.18ms | 24 bytes |
-| **Echo** | 580,000 | 0.22ms | 32 bytes |
+| --------- | ------------ | ------------- | -------------- |
+| **Fiber** | 840,000      | 0.15ms        | 0 bytes        |
+| **Gin**   | 720,000      | 0.18ms        | 24 bytes       |
+| **Echo**  | 580,000      | 0.22ms        | 32 bytes       |
 
 **Winner: Fiber** (16% faster than Gin, 45% faster than Echo)
 
 #### 1.2 Complex Routes (10+ params, middleware)
 
 | Framework | Requests/sec | Latency (p95) | Memory/Request |
-|-----------|--------------|---------------|----------------|
-| **Fiber** | 520,000 | 0.28ms | 12 bytes |
-| **Gin** | 480,000 | 0.31ms | 48 bytes |
-| **Echo** | 420,000 | 0.35ms | 64 bytes |
+| --------- | ------------ | ------------- | -------------- |
+| **Fiber** | 520,000      | 0.28ms        | 12 bytes       |
+| **Gin**   | 480,000      | 0.31ms        | 48 bytes       |
+| **Echo**  | 420,000      | 0.35ms        | 64 bytes       |
 
 **Winner: Fiber** (8% faster than Gin, 24% faster than Echo)
 
 #### 1.3 Real-World API (JSON parsing, database query simulation)
 
 | Framework | Requests/sec | Latency (p95) | Memory/Request |
-|-----------|--------------|---------------|----------------|
-| **Fiber** | 180,000 | 1.2ms | 256 bytes |
-| **Gin** | 165,000 | 1.4ms | 312 bytes |
-| **Echo** | 155,000 | 1.6ms | 384 bytes |
+| --------- | ------------ | ------------- | -------------- |
+| **Fiber** | 180,000      | 1.2ms         | 256 bytes      |
+| **Gin**   | 165,000      | 1.4ms         | 312 bytes      |
+| **Echo**  | 155,000      | 1.6ms         | 384 bytes      |
 
 **Winner: Fiber** (9% faster than Gin, 16% faster than Echo)
 
 #### 1.4 Memory Efficiency
 
 | Framework | Memory Footprint (MB) | Allocations/Request | GC Pressure |
-|-----------|------------------------|---------------------|-------------|
-| **Fiber** | 8 MB | 0-2 | Very Low |
-| **Gin** | 12 MB | 5-8 | Low |
-| **Echo** | 14 MB | 8-12 | Moderate |
+| --------- | --------------------- | ------------------- | ----------- |
+| **Fiber** | 8 MB                  | 0-2                 | Very Low    |
+| **Gin**   | 12 MB                 | 5-8                 | Low         |
+| **Echo**  | 14 MB                 | 8-12                | Moderate    |
 
 **Winner: Fiber** (40% less memory than Gin, 43% less than Echo)
 
@@ -165,23 +170,23 @@ Fiber consistently outperforms both Gin and Echo across all benchmarks due to Fa
 
 ### 2. Feature Comparison
 
-| Feature | Fiber | Echo | Gin |
-|---------|-------|------|-----|
-| **Routing** | ✅ Zero-alloc radix tree | ✅ Radix tree | ✅ Radix tree (httprouter) |
-| **Middleware** | ✅ 50+ built-in | ✅ 20+ built-in | ✅ 30+ community |
-| **WebSocket** | ✅ Built-in | ✅ Built-in | ⚠️ Third-party |
-| **Rate Limiting** | ✅ Built-in | ⚠️ Third-party | ⚠️ Third-party |
-| **Compression** | ✅ Built-in (gzip, brotli) | ✅ Built-in (gzip) | ⚠️ Third-party |
-| **CORS** | ✅ Built-in | ✅ Built-in | ⚠️ Third-party |
-| **JWT Auth** | ✅ Built-in | ✅ Built-in | ⚠️ Third-party |
-| **Static Files** | ✅ Optimized | ✅ Standard | ✅ Standard |
-| **Template Engine** | ✅ 8+ engines | ✅ Standard | ✅ Standard |
-| **Request Validation** | ✅ Built-in | ✅ Built-in | ✅ Built-in |
-| **Auto TLS** | ⚠️ Manual | ✅ Built-in | ⚠️ Manual |
-| **HTTP/2** | ✅ Supported | ✅ Supported | ✅ Supported |
-| **OpenAPI/Swagger** | ✅ fiber-swagger | ✅ echo-swagger | ✅ swag |
-| **Testing Utilities** | ✅ Excellent | ✅ Good | ✅ Excellent |
-| **Prefork Mode** | ✅ Built-in | ❌ No | ❌ No |
+| Feature                | Fiber                      | Echo               | Gin                        |
+| ---------------------- | -------------------------- | ------------------ | -------------------------- |
+| **Routing**            | ✅ Zero-alloc radix tree   | ✅ Radix tree      | ✅ Radix tree (httprouter) |
+| **Middleware**         | ✅ 50+ built-in            | ✅ 20+ built-in    | ✅ 30+ community           |
+| **WebSocket**          | ✅ Built-in                | ✅ Built-in        | ⚠️ Third-party             |
+| **Rate Limiting**      | ✅ Built-in                | ⚠️ Third-party     | ⚠️ Third-party             |
+| **Compression**        | ✅ Built-in (gzip, brotli) | ✅ Built-in (gzip) | ⚠️ Third-party             |
+| **CORS**               | ✅ Built-in                | ✅ Built-in        | ⚠️ Third-party             |
+| **JWT Auth**           | ✅ Built-in                | ✅ Built-in        | ⚠️ Third-party             |
+| **Static Files**       | ✅ Optimized               | ✅ Standard        | ✅ Standard                |
+| **Template Engine**    | ✅ 8+ engines              | ✅ Standard        | ✅ Standard                |
+| **Request Validation** | ✅ Built-in                | ✅ Built-in        | ✅ Built-in                |
+| **Auto TLS**           | ⚠️ Manual                  | ✅ Built-in        | ⚠️ Manual                  |
+| **HTTP/2**             | ✅ Supported               | ✅ Supported       | ✅ Supported               |
+| **OpenAPI/Swagger**    | ✅ fiber-swagger           | ✅ echo-swagger    | ✅ swag                    |
+| **Testing Utilities**  | ✅ Excellent               | ✅ Good            | ✅ Excellent               |
+| **Prefork Mode**       | ✅ Built-in                | ❌ No              | ❌ No                      |
 
 **Winner: Fiber** (most built-in features, less reliance on third-party packages)
 
@@ -194,6 +199,7 @@ Fiber consistently outperforms both Gin and Echo across all benchmarks due to Fa
 **Model:** Goroutine-per-request + Fasthttp connection pooling
 
 **Details:**
+
 - Each request handled in a separate goroutine
 - Fasthttp reuses connections and buffers (zero-allocation)
 - **Prefork mode**: Can spawn multiple processes (one per CPU core)
@@ -201,16 +207,19 @@ Fiber consistently outperforms both Gin and Echo across all benchmarks due to Fa
 - Context reuse with `ctx.Context()` for compatibility
 
 **Strengths:**
+
 - Extremely efficient memory usage
 - Can handle 1M+ concurrent connections
 - Prefork mode scales linearly with CPU cores
 - Zero allocations in hot path
 
 **Weaknesses:**
+
 - Fasthttp context not compatible with standard library (requires conversion)
 - Must be careful with context handling in goroutines
 
 **Code Example:**
+
 ```go
 app := fiber.New(fiber.Config{
     Prefork: true, // Enable multi-process mode
@@ -240,35 +249,39 @@ app.Get("/async", func(c *fiber.Ctx) error {
 **Model:** Standard net/http goroutine-per-request
 
 **Details:**
+
 - Uses standard library's HTTP server
 - Each request handled in separate goroutine
 - Standard context.Context throughout
 - Connection pooling through net/http
 
 **Strengths:**
+
 - Full compatibility with standard library
 - Predictable behavior
 - Easy to reason about
 - Works with all net/http middleware
 
 **Weaknesses:**
+
 - More memory allocations than Fiber
 - No built-in prefork mode
 - Moderate performance under extreme load
 
 **Code Example:**
+
 ```go
 e := echo.New()
 
 e.GET("/products", func(c echo.Context) error {
     // Standard context available
     ctx := c.Request().Context()
-    
+
     // Spawn background task
     go func() {
         processAsync(ctx)
     }()
-    
+
     return c.JSON(http.StatusOK, products)
 })
 ```
@@ -278,40 +291,45 @@ e.GET("/products", func(c echo.Context) error {
 **Model:** Standard net/http goroutine-per-request with optimized routing
 
 **Details:**
+
 - Uses standard library HTTP server
 - Optimized httprouter (radix tree)
 - Each request in separate goroutine
 - Standard context.Context
 
 **Strengths:**
+
 - Battle-tested at scale (used by many large companies)
 - Excellent routing performance
 - Standard library compatibility
 - Predictable concurrency model
 
 **Weaknesses:**
+
 - More allocations than Fiber
 - No prefork mode
 - Fewer built-in concurrency tools
 
 **Code Example:**
+
 ```go
 r := gin.Default()
 
 r.GET("/products", func(c *gin.Context) {
     // Access standard context
     ctx := c.Request.Context()
-    
+
     // Spawn background task
     go func() {
         processAsync(ctx)
     }()
-    
+
     c.JSON(http.StatusOK, products)
 })
 ```
 
 **Concurrency Verdict:**
+
 - **Fiber**: Best for extreme throughput, efficient memory usage, prefork mode is unique
 - **Echo**: Best standard library compatibility, predictable
 - **Gin**: Excellent balance, proven at scale
@@ -322,45 +340,48 @@ r.GET("/products", func(c *gin.Context) {
 
 #### 4.1 Project Activity (Last 12 Months)
 
-| Metric | Fiber | Echo | Gin |
-|--------|-------|------|-----|
-| **Commits** | 580 | 210 | 340 |
-| **Contributors** | 380 | 190 | 470 |
-| **Issues Closed** | 420 | 150 | 280 |
-| **PRs Merged** | 350 | 120 | 220 |
-| **Release Frequency** | Monthly | Quarterly | Bi-monthly |
-| **Response Time** | < 24 hours | 2-3 days | 1-2 days |
+| Metric                | Fiber      | Echo      | Gin        |
+| --------------------- | ---------- | --------- | ---------- |
+| **Commits**           | 580        | 210       | 340        |
+| **Contributors**      | 380        | 190       | 470        |
+| **Issues Closed**     | 420        | 150       | 280        |
+| **PRs Merged**        | 350        | 120       | 220        |
+| **Release Frequency** | Monthly    | Quarterly | Bi-monthly |
+| **Response Time**     | < 24 hours | 2-3 days  | 1-2 days   |
 
 **Winner: Fiber** (most active development, fastest response times)
 
 #### 4.2 Community Size
 
-| Metric | Fiber | Echo | Gin |
-|--------|-------|------|-----|
-| **GitHub Stars** | 32,000 | 28,000 | 76,000 |
-| **Forks** | 1,600 | 3,700 | 8,000 |
-| **Discord Members** | 7,500 | N/A | 2,800 |
-| **Stack Overflow Qs** | 1,200 | 2,800 | 6,500 |
-| **Tutorial Videos** | 350+ | 280+ | 800+ |
-| **Medium Articles** | 1,100+ | 900+ | 2,400+ |
+| Metric                | Fiber  | Echo   | Gin    |
+| --------------------- | ------ | ------ | ------ |
+| **GitHub Stars**      | 32,000 | 28,000 | 76,000 |
+| **Forks**             | 1,600  | 3,700  | 8,000  |
+| **Discord Members**   | 7,500  | N/A    | 2,800  |
+| **Stack Overflow Qs** | 1,200  | 2,800  | 6,500  |
+| **Tutorial Videos**   | 350+   | 280+   | 800+   |
+| **Medium Articles**   | 1,100+ | 900+   | 2,400+ |
 
 **Winner: Gin** (largest community, most resources, but Fiber growing fastest)
 
 #### 4.3 Production Usage
 
 **Fiber:**
+
 - Relatively newer (2020) but rapidly growing
 - Used by ByteDance, Alibaba Cloud, several startups
 - Strong adoption in microservices
 - Growing enterprise usage
 
 **Echo:**
+
 - Mature (2015), steady usage
 - Used by several mid-size companies
 - Popular in fintech
 - Stable but not growing rapidly
 
 **Gin:**
+
 - Most mature (2014), battle-tested
 - Used by Tencent, Alibaba, many large enterprises
 - Industry standard in China
@@ -371,16 +392,19 @@ r.GET("/products", func(c *gin.Context) {
 #### 4.4 Breaking Changes History
 
 **Fiber:**
+
 - v1 → v2 (2020): Major breaking changes (API redesign)
 - v2 → v3 (2026, upcoming): Some breaking changes planned
 - Frequent minor version updates (good for features, requires monitoring)
 
 **Echo:**
+
 - v3 → v4 (2019): Moderate breaking changes
 - v4 stable since 2019 (minimal breaking changes)
 - Very stable API
 
 **Gin:**
+
 - v1 stable since 2014
 - No major breaking changes planned
 - Most stable API of the three
@@ -394,6 +418,7 @@ r.GET("/products", func(c *gin.Context) {
 #### 5.1 API Design
 
 **Fiber:**
+
 ```go
 // Express.js-inspired, very intuitive
 app := fiber.New()
@@ -411,6 +436,7 @@ app.Get("/users/:id", func(c *fiber.Ctx) error {
 **Cons:** Fasthttp context can be confusing at first
 
 **Echo:**
+
 ```go
 // Standard, clean API
 e := echo.New()
@@ -428,6 +454,7 @@ e.GET("/users/:id", func(c echo.Context) error {
 **Cons:** More verbose for simple cases
 
 **Gin:**
+
 ```go
 // Martini-inspired, concise
 r := gin.Default()
@@ -449,6 +476,7 @@ r.GET("/users/:id", func(c *gin.Context) {
 #### 5.2 Error Handling
 
 **Fiber:**
+
 ```go
 app.Get("/users/:id", func(c *fiber.Ctx) error {
     if err := getUser(id); err != nil {
@@ -473,6 +501,7 @@ app.Use(func(c *fiber.Ctx) error {
 **Cons:** Must remember to return errors
 
 **Echo:**
+
 ```go
 e.GET("/users/:id", func(c echo.Context) error {
     if err := getUser(id); err != nil {
@@ -491,6 +520,7 @@ e.HTTPErrorHandler = func(err error, c echo.Context) {
 **Cons:** More verbose
 
 **Gin:**
+
 ```go
 r.GET("/users/:id", func(c *gin.Context) {
     if err := getUser(id); err != nil {
@@ -514,6 +544,7 @@ r.Use(gin.Recovery())
 All three frameworks have excellent testing support:
 
 **Fiber:**
+
 ```go
 app := fiber.New()
 app.Get("/", handler)
@@ -524,6 +555,7 @@ assert.Equal(t, 200, resp.StatusCode)
 ```
 
 **Echo:**
+
 ```go
 e := echo.New()
 e.GET("/", handler)
@@ -535,6 +567,7 @@ assert.Equal(t, 200, rec.Code)
 ```
 
 **Gin:**
+
 ```go
 gin.SetMode(gin.TestMode)
 r := gin.Default()
@@ -555,6 +588,7 @@ assert.Equal(t, 200, w.Code)
 #### 6.1 Built-in Middleware
 
 **Fiber (50+ middleware):**
+
 - Logger, recover, compress, cors, csrf, limiter
 - JWT, basic auth, keyauth, session
 - Cache, etag, favicon, filesystem
@@ -562,12 +596,14 @@ assert.Equal(t, 200, w.Code)
 - Timeout, helmet (security), encryptcookie
 
 **Echo (20+ middleware):**
+
 - Logger, recover, gzip, cors, csrf
 - JWT, basic auth, key auth
 - Body limit, rate limiter, request ID
 - Secure, redirect, static, timeout
 
 **Gin (30+ community middleware):**
+
 - Logger, recovery
 - Community: cors, gzip, jwt, rate limiter
 - Most require external packages
@@ -576,15 +612,15 @@ assert.Equal(t, 200, w.Code)
 
 #### 6.2 Third-Party Ecosystem
 
-| Integration | Fiber | Echo | Gin |
-|-------------|-------|------|-----|
-| **ORM (GORM)** | ✅ | ✅ | ✅ |
-| **Validation** | ✅ | ✅ | ✅ |
-| **OpenAPI/Swagger** | ✅ fiber-swagger | ✅ echo-swagger | ✅ swag/gin-swagger |
-| **Prometheus** | ✅ | ✅ | ✅ |
-| **Tracing (Jaeger)** | ✅ | ✅ | ✅ |
-| **GraphQL** | ✅ | ✅ | ✅ |
-| **WebSocket** | ✅ Built-in | ✅ Built-in | ⚠️ gorilla/websocket |
+| Integration          | Fiber            | Echo            | Gin                  |
+| -------------------- | ---------------- | --------------- | -------------------- |
+| **ORM (GORM)**       | ✅               | ✅              | ✅                   |
+| **Validation**       | ✅               | ✅              | ✅                   |
+| **OpenAPI/Swagger**  | ✅ fiber-swagger | ✅ echo-swagger | ✅ swag/gin-swagger  |
+| **Prometheus**       | ✅               | ✅              | ✅                   |
+| **Tracing (Jaeger)** | ✅               | ✅              | ✅                   |
+| **GraphQL**          | ✅               | ✅              | ✅                   |
+| **WebSocket**        | ✅ Built-in      | ✅ Built-in     | ⚠️ gorilla/websocket |
 
 **Winner: Tie** (all frameworks work well with standard Go libraries)
 
@@ -592,13 +628,13 @@ assert.Equal(t, 200, w.Code)
 
 ### 7. Documentation Quality
 
-| Aspect | Fiber | Echo | Gin |
-|--------|-------|------|-----|
-| **Official Docs** | ⭐⭐⭐⭐⭐ Excellent | ⭐⭐⭐⭐ Very Good | ⭐⭐⭐⭐ Very Good |
-| **Code Examples** | ⭐⭐⭐⭐⭐ Extensive | ⭐⭐⭐⭐ Good | ⭐⭐⭐⭐ Good |
-| **API Reference** | ⭐⭐⭐⭐⭐ Complete | ⭐⭐⭐⭐ Complete | ⭐⭐⭐ Adequate |
-| **Tutorials** | ⭐⭐⭐⭐ Many | ⭐⭐⭐ Some | ⭐⭐⭐⭐⭐ Very Many |
-| **Video Content** | ⭐⭐⭐⭐ Growing | ⭐⭐⭐ Limited | ⭐⭐⭐⭐⭐ Extensive |
+| Aspect            | Fiber                | Echo               | Gin                  |
+| ----------------- | -------------------- | ------------------ | -------------------- |
+| **Official Docs** | ⭐⭐⭐⭐⭐ Excellent | ⭐⭐⭐⭐ Very Good | ⭐⭐⭐⭐ Very Good   |
+| **Code Examples** | ⭐⭐⭐⭐⭐ Extensive | ⭐⭐⭐⭐ Good      | ⭐⭐⭐⭐ Good        |
+| **API Reference** | ⭐⭐⭐⭐⭐ Complete  | ⭐⭐⭐⭐ Complete  | ⭐⭐⭐ Adequate      |
+| **Tutorials**     | ⭐⭐⭐⭐ Many        | ⭐⭐⭐ Some        | ⭐⭐⭐⭐⭐ Very Many |
+| **Video Content** | ⭐⭐⭐⭐ Growing     | ⭐⭐⭐ Limited     | ⭐⭐⭐⭐⭐ Extensive |
 
 **Winner: Fiber** (best official documentation, though Gin has more community content)
 
@@ -615,14 +651,14 @@ All frameworks work equally well with database libraries like pgx or GORM for Po
 app.Get("/stores/nearby", func(c *fiber.Ctx) error {
     lat := c.QueryFloat("lat")
     lng := c.QueryFloat("lng")
-    
-    stores, err := queries.GetNearbyStores(c.Context(), 
+
+    stores, err := queries.GetNearbyStores(c.Context(),
         sqlc.GetNearbyStoresParams{
             Latitude: lat,
             Longitude: lng,
             RadiusKm: 1.0,
         })
-    
+
     if err != nil {
         return err
     }
@@ -635,6 +671,7 @@ app.Get("/stores/nearby", func(c *fiber.Ctx) error {
 #### 8.2 Real-time Features (WebSocket)
 
 **Fiber:**
+
 ```go
 app.Get("/ws", websocket.New(func(c *websocket.Conn) {
     for {
@@ -648,6 +685,7 @@ app.Get("/ws", websocket.New(func(c *websocket.Conn) {
 ```
 
 **Echo:**
+
 ```go
 e.GET("/ws", func(c echo.Context) error {
     websocket.Handler(func(ws *websocket.Conn) {
@@ -661,6 +699,7 @@ e.GET("/ws", func(c echo.Context) error {
 ```
 
 **Gin:**
+
 ```go
 // Requires gorilla/websocket
 r.GET("/ws", func(c *gin.Context) {
@@ -677,6 +716,7 @@ r.GET("/ws", func(c *gin.Context) {
 #### 8.3 Rate Limiting (for API throttling)
 
 **Fiber:**
+
 ```go
 app.Use(limiter.New(limiter.Config{
     Max: 100,
@@ -688,6 +728,7 @@ app.Use(limiter.New(limiter.Config{
 ```
 
 **Echo:**
+
 ```go
 // Requires third-party package
 e.Use(middleware.RateLimiter(middleware.NewRateLimiterMemoryStore(
@@ -695,6 +736,7 @@ e.Use(middleware.RateLimiter(middleware.NewRateLimiterMemoryStore(
 ```
 
 **Gin:**
+
 ```go
 // Requires third-party package like gin-rate-limit
 r.Use(ratelimit.RateLimiter(store, &config))
@@ -705,6 +747,7 @@ r.Use(ratelimit.RateLimiter(store, &config))
 #### 8.4 Prefork for Multi-Core
 
 **Fiber:**
+
 ```go
 app := fiber.New(fiber.Config{
     Prefork: true, // Spawn process per CPU core
@@ -721,6 +764,7 @@ app := fiber.New(fiber.Config{
 ## Recommendation Matrix
 
 ### Choose **Fiber** if:
+
 - ✅ Maximum performance is critical (10-50K+ concurrent users)
 - ✅ Memory efficiency matters (running on constrained resources)
 - ✅ You want Express.js-like developer experience
@@ -730,6 +774,7 @@ app := fiber.New(fiber.Config{
 - ✅ Project is greenfield (can adopt latest practices)
 
 ### Choose **Echo** if:
+
 - ✅ Standard library compatibility is essential
 - ✅ You need Auto TLS/ACME support
 - ✅ You prefer simpler, more predictable behavior
@@ -738,6 +783,7 @@ app := fiber.New(fiber.Config{
 - ✅ You want balance between performance and convention
 
 ### Choose **Gin** if:
+
 - ✅ Project longevity and stability are paramount
 - ✅ Largest community and most resources are important
 - ✅ Battle-tested at scale is required
@@ -755,12 +801,14 @@ app := fiber.New(fiber.Config{
 ### Detailed Reasoning:
 
 #### 1. **Performance Aligns with Requirements**
+
 - Precium targets 50K+ concurrent users → Fiber handles this easily
 - API response < 100ms target → Fiber's zero-allocation design optimal
 - Route optimization algorithms → Every millisecond matters
 - Geographic queries → Fiber's speed reduces query overhead
 
 #### 2. **Built-in Features Match Needs**
+
 - **Rate Limiting**: Essential for subscription tiers (Free: 10 searches/day)
 - **WebSocket**: Future real-time price updates
 - **Compression**: Reduces bandwidth for mobile clients
@@ -768,12 +816,14 @@ app := fiber.New(fiber.Config{
 - **Prefork**: Can spawn one process per CPU core for better scaling
 
 #### 3. **Developer Experience**
+
 - Express.js-like API familiar to team if they know JavaScript/React
 - Clear error handling model
 - Excellent documentation
 - Fast iteration with hot reload
 
 #### 4. **Maintenance Confidence**
+
 - Very active development (monthly releases)
 - Responsive maintainer (< 24h response time)
 - Growing rapidly (32K stars, 7.5K Discord members)
@@ -781,17 +831,20 @@ app := fiber.New(fiber.Config{
 - Modern codebase, no legacy baggage
 
 #### 5. **Ecosystem Compatibility**
+
 - Works perfectly with SQLC (our chosen query builder)
 - Excellent PostgreSQL support (via pgx, GORM)
 - Native Casbin integration for authorization
 - fiber-swagger for OpenAPI documentation
 
 #### 6. **Cost Efficiency**
+
 - 40% less memory usage → Lower infrastructure costs
 - Can handle more load per instance → Fewer servers needed
 - Prefork mode → Better CPU utilization
 
 #### 7. **Future-Proofing**
+
 - Microservices-ready (can split services later)
 - gRPC support for internal communication
 - Modern architecture patterns
@@ -850,7 +903,7 @@ func main() {
 
     // Routes
     app.Get("/health", healthCheck)
-    
+
     api := app.Group("/api/v1")
     api.Get("/products", getProducts)
     api.Post("/search", searchProducts)
@@ -863,6 +916,7 @@ func main() {
 ### Phase 2: Middleware Integration (Week 2)
 
 1. **JWT Authentication**
+
 ```go
 import "github.com/gofiber/fiber/v2/middleware/jwt"
 
@@ -872,6 +926,7 @@ app.Use(jwt.New(jwt.Config{
 ```
 
 2. **Casbin Authorization**
+
 ```go
 import "github.com/casbin/casbin/v2"
 
@@ -890,11 +945,12 @@ func AuthMiddleware(enforcer *casbin.Enforcer) fiber.Handler {
 ```
 
 3. **Subscription Tier Enforcement**
+
 ```go
 func SubscriptionMiddleware() fiber.Handler {
     return func(c *fiber.Ctx) error {
         userTier := c.Locals("subscription_tier").(string)
-        
+
         if userTier == "free" {
             // Check daily limit from Redis
             count := getDailySearchCount(userID)
@@ -904,7 +960,7 @@ func SubscriptionMiddleware() fiber.Handler {
                 })
             }
         }
-        
+
         return c.Next()
     }
 }
@@ -916,16 +972,16 @@ func SubscriptionMiddleware() fiber.Handler {
 // Using SQLC-generated queries
 func getProducts(c *fiber.Ctx) error {
     queries := sqlc.New(db)
-    
+
     products, err := queries.ListProducts(c.Context(), sqlc.ListProductsParams{
         Limit:  10,
         Offset: 0,
     })
-    
+
     if err != nil {
         return err
     }
-    
+
     return c.JSON(products)
 }
 ```
@@ -936,10 +992,10 @@ func getProducts(c *fiber.Ctx) error {
 func TestGetProducts(t *testing.T) {
     app := fiber.New()
     app.Get("/products", getProducts)
-    
+
     req := httptest.NewRequest("GET", "/products", nil)
     resp, _ := app.Test(req)
-    
+
     assert.Equal(t, 200, resp.StatusCode)
 }
 ```
@@ -954,6 +1010,7 @@ func TestGetProducts(t *testing.T) {
 **Likelihood:** Medium  
 **Impact:** Low  
 **Mitigation:**
+
 - Use `c.Context()` to get standard context
 - Fiber has adapters for most common needs
 - Community provides bridges for edge cases
@@ -964,6 +1021,7 @@ func TestGetProducts(t *testing.T) {
 **Likelihood:** Medium (v3 planned for 2026)  
 **Impact:** Medium  
 **Mitigation:**
+
 - Stay on v2 for initial development
 - Monitor v3 development
 - Plan upgrade during maintenance window
@@ -975,6 +1033,7 @@ func TestGetProducts(t *testing.T) {
 **Likelihood:** Low  
 **Impact:** Low  
 **Mitigation:**
+
 - Documentation is excellent
 - Discord community very responsive (< 2 hours)
 - Growing rapidly
@@ -987,6 +1046,7 @@ func TestGetProducts(t *testing.T) {
 **For the Precium project, Fiber v2.52+ is the recommended framework.**
 
 The decision is based on:
+
 1. **Performance**: Best-in-class throughput and memory efficiency
 2. **Features**: Built-in rate limiting, WebSocket, compression match requirements
 3. **Developer Experience**: Express.js-like API, excellent docs
@@ -996,6 +1056,7 @@ The decision is based on:
 While Gin has a larger community and longer track record, Fiber's performance advantages, built-in features, and active development make it the better choice for a modern, performance-critical application like Precium.
 
 The 10-20% performance improvement over Gin and 30-40% over Echo translates to:
+
 - **Lower infrastructure costs** (fewer servers needed)
 - **Better user experience** (faster response times)
 - **Higher capacity** (more concurrent users per instance)

@@ -74,6 +74,7 @@ This document outlines the Continuous Integration and Continuous Deployment stra
 ## Environments
 
 ### 1. Development (Local)
+
 - **Trigger**: Manual (docker-compose up)
 - **Purpose**: Local development and testing
 - **Infrastructure**: Docker Compose
@@ -81,6 +82,7 @@ This document outlines the Continuous Integration and Continuous Deployment stra
 - **Domain**: localhost:3000 (web), localhost:3001 (api)
 
 ### 2. Staging
+
 - **Trigger**: Push to `develop` branch
 - **Purpose**: Integration testing and QA
 - **Infrastructure**: Cloud (AWS/GCP/Azure)
@@ -89,6 +91,7 @@ This document outlines the Continuous Integration and Continuous Deployment stra
 - **Features**: Production-like environment
 
 ### 3. Production
+
 - **Trigger**: Push to `main` branch (after approval)
 - **Purpose**: Live user-facing application
 - **Infrastructure**: Cloud with auto-scaling
@@ -204,7 +207,7 @@ jobs:
           --health-retries 5
         ports:
           - 5432:5432
-      
+
       redis:
         image: redis:7-alpine
         options: >-
@@ -570,7 +573,8 @@ jobs:
 7. Complete deployment
 ```
 
-**Rollback**: 
+**Rollback**:
+
 ```bash
 # Rollback to previous task definition
 aws ecs update-service \
@@ -633,7 +637,7 @@ CREATE TABLE promotions (
     created_at TIMESTAMP DEFAULT NOW()
 );
 
-CREATE INDEX idx_promotions_dates 
+CREATE INDEX idx_promotions_dates
     ON promotions(start_date, end_date);
 
 -- 20260208_add_promotions_table.down.sql
@@ -717,7 +721,7 @@ type Handler struct {
 
 func (h *Handler) Check(c *fiber.Ctx) error {
     ctx := context.Background()
-    
+
     // Check database
     if err := h.db.PingContext(ctx); err != nil {
         return c.Status(503).JSON(fiber.Map{
@@ -725,7 +729,7 @@ func (h *Handler) Check(c *fiber.Ctx) error {
             "database": "down",
         })
     }
-    
+
     // Check Redis
     if err := h.redis.Ping(ctx).Err(); err != nil {
         return c.Status(503).JSON(fiber.Map{
@@ -733,7 +737,7 @@ func (h *Handler) Check(c *fiber.Ctx) error {
             "redis": "down",
         })
     }
-    
+
     return c.JSON(fiber.Map{
         "status": "healthy",
         "database": "up",
@@ -791,9 +795,7 @@ alerts:
       "prettier --write",
       "jest --bail --findRelatedTests"
     ],
-    "*.{json,md,yml}": [
-      "prettier --write"
-    ]
+    "*.{json,md,yml}": ["prettier --write"]
   }
 }
 ```

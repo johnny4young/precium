@@ -6,38 +6,40 @@ After careful analysis, **Golang** has been selected as the backend technology f
 
 ## Final Technology Stack
 
-| Component | Technology | Version | Rationale |
-|-----------|-----------|---------|-----------|
-| **Backend** | Golang | 1.23+ LTS | Performance, concurrency, microservices-ready |
-| **Backend Framework** | Fiber | 2.52+ | Fastest Go web framework, Express-like API |
-| **Database** | PostgreSQL | 17+ | Proven reliability, excellent GIS support |
-| **Database Extension** | PostGIS | 3.4+ | Geographic/spatial data operations |
-| **ORM** | Drizzle ORM | Latest | Type-safe, modern, lightweight |
-| **Cache** | Redis | 7+ | Performance optimization, sessions |
-| **Frontend Web** | React | 18+ | Industry standard, component reusability |
-| **Build Tool** | Vite | 6+ | Ultra-fast builds, modern toolchain |
-| **Mobile** | React Native | 0.76+ | Code sharing, cross-platform |
-| **Runtime (Tools)** | Node.js | 24 LTS | Frontend tooling, build processes |
-| **Package Manager** | npm | 10+ | Native workspaces, industry standard |
-| **Monorepo** | npm workspaces | Native | Simple, no extra tooling needed |
-| **API Protocol** | REST/JSON | - | Universal compatibility, simplicity |
-| **Internal Services** | gRPC | - | High-performance service communication |
-| **Type Safety** | TypeScript | 5.7+ | Frontend type safety |
-| **Validation** | Zod | 3+ | Runtime validation, TypeScript integration |
-| **CI/CD** | GitHub Actions | - | Native GitHub integration |
-| **Hosting** | Cloud | - | AWS/GCP/Azure managed services |
+| Component              | Technology     | Version   | Rationale                                     |
+| ---------------------- | -------------- | --------- | --------------------------------------------- |
+| **Backend**            | Golang         | 1.23+ LTS | Performance, concurrency, microservices-ready |
+| **Backend Framework**  | Fiber          | 2.52+     | Fastest Go web framework, Express-like API    |
+| **Database**           | PostgreSQL     | 17+       | Proven reliability, excellent GIS support     |
+| **Database Extension** | PostGIS        | 3.4+      | Geographic/spatial data operations            |
+| **ORM**                | Drizzle ORM    | Latest    | Type-safe, modern, lightweight                |
+| **Cache**              | Redis          | 7+        | Performance optimization, sessions            |
+| **Frontend Web**       | React          | 18+       | Industry standard, component reusability      |
+| **Build Tool**         | Vite           | 6+        | Ultra-fast builds, modern toolchain           |
+| **Mobile**             | React Native   | 0.76+     | Code sharing, cross-platform                  |
+| **Runtime (Tools)**    | Node.js        | 24 LTS    | Frontend tooling, build processes             |
+| **Package Manager**    | npm            | 10+       | Native workspaces, industry standard          |
+| **Monorepo**           | npm workspaces | Native    | Simple, no extra tooling needed               |
+| **API Protocol**       | REST/JSON      | -         | Universal compatibility, simplicity           |
+| **Internal Services**  | gRPC           | -         | High-performance service communication        |
+| **Type Safety**        | TypeScript     | 5.7+      | Frontend type safety                          |
+| **Validation**         | Zod            | 3+        | Runtime validation, TypeScript integration    |
+| **CI/CD**              | GitHub Actions | -         | Native GitHub integration                     |
+| **Hosting**            | Cloud          | -         | AWS/GCP/Azure managed services                |
 
 ## Why Golang for Backend?
 
 ### 1. Performance & Efficiency ⚡
 
 **Compiled Language Benefits:**
+
 - Native machine code compilation (10-100x faster than interpreted languages)
 - No JIT warmup time - instant performance
 - Low memory footprint (~25MB for basic API vs ~200MB for Node.js)
 - Garbage collector optimized for server workloads
 
 **Specific to Precium:**
+
 - **Route Optimization**: TSP and pathfinding algorithms are CPU-intensive
   - Golang: Process 1000 routes/second
   - Node.js: Process 100 routes/second (10x slower)
@@ -47,22 +49,24 @@ After careful analysis, **Golang** has been selected as the backend technology f
 ### 2. Built-in Concurrency 🔄
 
 **Goroutines:**
+
 ```go
 // Handle thousands of concurrent requests efficiently
 func searchProducts(w http.ResponseWriter, r *http.Request) {
     // Each request runs in its own goroutine (~2KB stack)
     // vs Node.js event loop limitations
-    
+
     // Can spawn additional goroutines for parallel processing
     go processAnalytics(request)
     go updateCache(request)
-    
+
     results := queryDatabase(request)
     json.NewEncoder(w).Encode(results)
 }
 ```
 
 **Channels for Communication:**
+
 ```go
 // Safe concurrent data handling
 results := make(chan Product, 100)
@@ -72,6 +76,7 @@ go fetchFromStore3(results)
 ```
 
 **Why This Matters:**
+
 - **Price Comparison**: Query multiple stores simultaneously
 - **Route Optimization**: Parallel algorithm execution
 - **OCR Processing**: Process multiple receipts concurrently
@@ -80,6 +85,7 @@ go fetchFromStore3(results)
 ### 3. Strong Static Typing 🔒
 
 **Compile-Time Safety:**
+
 ```go
 type Product struct {
     ID          string    `json:"id" validate:"required,uuid"`
@@ -96,6 +102,7 @@ func CalculateDiscount(price float64, discount int) float64 {
 ```
 
 **Benefits:**
+
 - Catch bugs at compile time, not production
 - Better IDE autocompletion and refactoring
 - Self-documenting code
@@ -104,6 +111,7 @@ func CalculateDiscount(price float64, discount int) float64 {
 ### 4. Microservices Architecture 🏗️
 
 **Small, Fast Binaries:**
+
 ```bash
 # Golang binary
 -rwxr-xr-x  1 user  staff   8.5M  backend
@@ -115,12 +123,14 @@ func CalculateDiscount(price float64, discount int) float64 {
 ```
 
 **Easy Deployment:**
+
 - Single binary contains everything
 - No dependency hell
 - Cross-compilation for different platforms
 - Perfect for containers (Alpine Linux + binary = 10MB image)
 
 **Precium Microservices:**
+
 ```
 ┌─────────────────┐
 │  API Gateway    │  (Fiber - handles all client requests)
@@ -142,6 +152,7 @@ func CalculateDiscount(price float64, discount int) float64 {
 ### 5. Standard Library 📚
 
 **Batteries Included:**
+
 ```go
 import (
     "net/http"      // HTTP server
@@ -154,6 +165,7 @@ import (
 ```
 
 **No Framework Fatigue:**
+
 - Standard library is stable and well-documented
 - Less dependency on third-party packages
 - Backward compatibility guarantee
@@ -162,6 +174,7 @@ import (
 ### 6. Developer Productivity 🚀
 
 **Fast Compilation:**
+
 ```bash
 # Full build of large projects
 go build ./...  # 2-5 seconds
@@ -171,6 +184,7 @@ air  # Automatic rebuild on file changes
 ```
 
 **Built-in Tooling:**
+
 ```bash
 go fmt       # Format code
 go vet       # Static analysis
@@ -181,6 +195,7 @@ golangci-lint # Comprehensive linting
 ```
 
 **Easy to Learn:**
+
 - Simple syntax (25 keywords vs JavaScript's 50+)
 - No inheritance, no exceptions, no magic
 - Clear error handling
@@ -189,11 +204,13 @@ golangci-lint # Comprehensive linting
 ### 7. Operational Excellence 🔧
 
 **Memory Management:**
+
 - Automatic garbage collection (optimized for low latency)
 - No memory leaks from closures (common in Node.js)
 - Predictable performance characteristics
 
 **Error Handling:**
+
 ```go
 // Explicit error handling - no silent failures
 result, err := fetchProduct(id)
@@ -204,6 +221,7 @@ if err != nil {
 ```
 
 **Observability:**
+
 ```go
 // Built-in profiling
 import _ "net/http/pprof"
@@ -217,12 +235,14 @@ import _ "net/http/pprof"
 ### 8. Cost Efficiency 💰
 
 **Lower Infrastructure Costs:**
+
 - Smaller container images (10MB vs 200MB+)
 - Lower memory usage (4x-10x less than Node.js)
 - Fewer CPU resources needed
 - Better resource utilization
 
 **Example:**
+
 ```
 Node.js Deployment:
 - 4 instances × 2GB RAM = 8GB
@@ -240,6 +260,7 @@ Savings: 75% reduction
 ### Backend Stack
 
 **Fiber Framework:**
+
 ```go
 package main
 
@@ -253,20 +274,21 @@ func main() {
     app := fiber.New(fiber.Config{
         AppName: "Precium API v1.0",
     })
-    
+
     // Middleware
     app.Use(logger.New())
     app.Use(cors.New())
-    
+
     // Routes
     app.Get("/api/v1/products", getProducts)
     app.Post("/api/v1/auth/login", login)
-    
+
     app.Listen(":3000")
 }
 ```
 
 **Why Fiber?**
+
 - Fastest Go web framework (benchmarks)
 - Express.js-like API (familiar to developers)
 - Built on fasthttp (optimized HTTP library)
@@ -274,6 +296,7 @@ func main() {
 - Excellent middleware ecosystem
 
 **PostgreSQL + PostGIS:**
+
 ```go
 import (
     "database/sql"
@@ -282,7 +305,7 @@ import (
 
 // PostGIS spatial queries
 query := `
-    SELECT s.*, 
+    SELECT s.*,
            ST_Distance(
                ST_MakePoint($1, $2)::geography,
                location
@@ -298,6 +321,7 @@ query := `
 ```
 
 **Why PostgreSQL 17?**
+
 - Latest performance improvements
 - Better JSON performance
 - Improved indexing
@@ -306,6 +330,7 @@ query := `
 ### Frontend Stack
 
 **React + Vite:**
+
 ```json
 {
   "scripts": {
@@ -317,6 +342,7 @@ query := `
 ```
 
 **Why Vite 6?**
+
 - Lightning-fast hot module replacement (HMR)
 - Native ES modules (no bundling in dev)
 - Optimized production builds
@@ -324,17 +350,16 @@ query := `
 - Built-in TypeScript support
 
 **npm Workspaces:**
+
 ```json
 {
   "name": "precium",
-  "workspaces": [
-    "apps/*",
-    "packages/*"
-  ]
+  "workspaces": ["apps/*", "packages/*"]
 }
 ```
 
 **Why npm Workspaces over Turborepo?**
+
 - Native npm feature (no extra dependencies)
 - Simpler setup and maintenance
 - Works well with mixed-language monorepos (Go + TS)
@@ -344,6 +369,7 @@ query := `
 ### Database Stack
 
 **Drizzle ORM:**
+
 ```typescript
 // Schema definition
 export const products = pgTable('products', {
@@ -363,6 +389,7 @@ const result = await db
 ```
 
 **Why Drizzle ORM?**
+
 - Modern, TypeScript-first ORM
 - Lightweight (no heavy runtime)
 - SQL-like syntax (familiar to developers)
@@ -371,33 +398,36 @@ const result = await db
 - Full type safety
 
 **Alternative Considered:**
+
 - **Prisma**: Heavier, more magic, slower
 - **TypeORM**: Older, decorator-heavy, maintenance concerns
 - **Kysely**: Type-safe but more low-level
 
 ## Comparison with Node.js Approach
 
-| Aspect | Golang | Node.js | Winner |
-|--------|--------|---------|--------|
-| **Performance** | Compiled, native | Interpreted, V8 JIT | ✅ Golang |
-| **Concurrency** | Goroutines (native) | Event loop (single-threaded) | ✅ Golang |
-| **Memory Usage** | ~25-50MB | ~200-500MB | ✅ Golang |
-| **CPU-Intensive Tasks** | Excellent | Poor (blocks event loop) | ✅ Golang |
-| **Route Optimization** | Fast algorithms | Needs workers/separate service | ✅ Golang |
-| **Startup Time** | <100ms | 1-2 seconds | ✅ Golang |
-| **Type Safety** | Compile-time | Runtime (TypeScript compiles to JS) | ✅ Golang |
-| **Learning Curve** | Simple, straightforward | Complex ecosystem | ✅ Golang |
-| **Ecosystem** | Growing, mature std lib | Massive (npm) | 🟡 Node.js |
-| **Frontend Sharing** | ❌ Different language | ✅ Same language | 🟡 Node.js |
-| **Deployment** | Single binary | node_modules folder | ✅ Golang |
+| Aspect                  | Golang                  | Node.js                             | Winner     |
+| ----------------------- | ----------------------- | ----------------------------------- | ---------- |
+| **Performance**         | Compiled, native        | Interpreted, V8 JIT                 | ✅ Golang  |
+| **Concurrency**         | Goroutines (native)     | Event loop (single-threaded)        | ✅ Golang  |
+| **Memory Usage**        | ~25-50MB                | ~200-500MB                          | ✅ Golang  |
+| **CPU-Intensive Tasks** | Excellent               | Poor (blocks event loop)            | ✅ Golang  |
+| **Route Optimization**  | Fast algorithms         | Needs workers/separate service      | ✅ Golang  |
+| **Startup Time**        | <100ms                  | 1-2 seconds                         | ✅ Golang  |
+| **Type Safety**         | Compile-time            | Runtime (TypeScript compiles to JS) | ✅ Golang  |
+| **Learning Curve**      | Simple, straightforward | Complex ecosystem                   | ✅ Golang  |
+| **Ecosystem**           | Growing, mature std lib | Massive (npm)                       | 🟡 Node.js |
+| **Frontend Sharing**    | ❌ Different language   | ✅ Same language                    | 🟡 Node.js |
+| **Deployment**          | Single binary           | node_modules folder                 | ✅ Golang  |
 
 ### When Node.js Would Be Better:
+
 - Pure CRUD API with no complex algorithms
 - Team only knows JavaScript
 - Need rapid prototyping over performance
 - Extensive use of npm packages required
 
 ### Why Golang is Better for Precium:
+
 - Route optimization algorithms (CPU-intensive)
 - Location-based queries (many concurrent requests)
 - Microservices architecture (small, fast services)
@@ -407,6 +437,7 @@ const result = await db
 ## Development Workflow
 
 ### Backend Development (Golang)
+
 ```bash
 # Development
 go mod download        # Install dependencies
@@ -427,6 +458,7 @@ docker run -p 3000:3000 precium-api
 ```
 
 ### Frontend Development (TypeScript)
+
 ```bash
 # Development
 npm install            # Install dependencies
@@ -448,6 +480,7 @@ Since backend is Golang and frontend is TypeScript, we need a strategy for type 
 ### 1. OpenAPI/Swagger Code Generation
 
 **Generate from Golang:**
+
 ```go
 // Add swag comments
 // @Summary Get products
@@ -466,6 +499,7 @@ func getProducts(c *fiber.Ctx) error {
 ```
 
 **Generate TypeScript types:**
+
 ```bash
 npx openapi-typescript ./docs/swagger.json -o ./packages/shared-types/src/api.ts
 ```
@@ -473,6 +507,7 @@ npx openapi-typescript ./docs/swagger.json -o ./packages/shared-types/src/api.ts
 ### 2. Shared Validation Schemas
 
 **Golang:**
+
 ```go
 import "github.com/go-playground/validator/v10"
 
@@ -483,18 +518,20 @@ type Product struct {
 ```
 
 **TypeScript (Zod):**
+
 ```typescript
 import { z } from 'zod';
 
 export const ProductSchema = z.object({
   name: z.string().min(3).max(100),
-  price: z.number().positive()
+  price: z.number().positive(),
 });
 ```
 
 ### 3. Runtime Contract Testing
 
 Test that Golang API matches TypeScript expectations:
+
 ```typescript
 // Integration tests
 import { ProductSchema } from '@precium/validation';
@@ -502,7 +539,7 @@ import { ProductSchema } from '@precium/validation';
 test('API returns valid product', async () => {
   const response = await fetch('/api/v1/products/123');
   const data = await response.json();
-  
+
   // Validate response matches schema
   expect(() => ProductSchema.parse(data)).not.toThrow();
 });
@@ -513,6 +550,7 @@ test('API returns valid product', async () => {
 Since the original plan was Node.js, here's the migration strategy:
 
 ### Changes Made:
+
 1. ✅ Backend: Node.js + NestJS → **Golang + Fiber**
 2. ✅ ORM: TypeORM/Prisma → **Drizzle ORM**
 3. ✅ Monorepo: Turborepo → **npm workspaces + Vite**
@@ -520,6 +558,7 @@ Since the original plan was Node.js, here's the migration strategy:
 5. ✅ Versions: Updated to latest LTS (Node 24, Go 1.23, PostgreSQL 17)
 
 ### What Stays the Same:
+
 - ✅ PostgreSQL + PostGIS (database)
 - ✅ Redis (caching)
 - ✅ React (web frontend)
@@ -530,20 +569,21 @@ Since the original plan was Node.js, here's the migration strategy:
 - ✅ GitHub Actions (CI/CD)
 
 ### Impact on Timeline:
+
 - **No significant change**: Golang is faster to develop than expected
 - **Benefits**: Better performance from day 1
 - **Trade-off**: Less code sharing between backend/frontend (acceptable)
 
 ## Performance Targets with Golang
 
-| Metric | Target | Expected with Golang |
-|--------|--------|---------------------|
-| API Response Time (p95) | < 200ms | ✅ < 100ms |
-| Database Query (p95) | < 50ms | ✅ < 30ms |
-| Route Optimization | < 2s | ✅ < 500ms |
-| Concurrent Users | 10,000+ | ✅ 50,000+ |
-| Memory per Instance | < 500MB | ✅ < 100MB |
-| Cold Start | < 1s | ✅ < 100ms |
+| Metric                  | Target  | Expected with Golang |
+| ----------------------- | ------- | -------------------- |
+| API Response Time (p95) | < 200ms | ✅ < 100ms           |
+| Database Query (p95)    | < 50ms  | ✅ < 30ms            |
+| Route Optimization      | < 2s    | ✅ < 500ms           |
+| Concurrent Users        | 10,000+ | ✅ 50,000+           |
+| Memory per Instance     | < 500MB | ✅ < 100MB           |
+| Cold Start              | < 1s    | ✅ < 100ms           |
 
 ## Conclusion
 

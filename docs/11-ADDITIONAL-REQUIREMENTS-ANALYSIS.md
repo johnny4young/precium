@@ -19,6 +19,7 @@ Client → Load Balancer → API Gateway → Backend Services
 #### Option A: Traditional API Gateway (Kong, Traefik, NGINX Plus)
 
 **Pros:**
+
 - Centralized authentication/authorization
 - Rate limiting and throttling
 - Request/response transformation
@@ -27,6 +28,7 @@ Client → Load Balancer → API Gateway → Backend Services
 - Circuit breaking
 
 **Cons:**
+
 - Additional infrastructure complexity
 - Single point of failure (unless redundant)
 - Learning curve and maintenance
@@ -49,6 +51,7 @@ Client → Load Balancer → Golang Backend (with middleware) → Services
    - Can extract to microservices later if needed
 
 2. **Built-in Golang Middleware**
+
 ```go
 // Fiber middleware stack
 app := fiber.New()
@@ -90,6 +93,7 @@ app.Use(requestid.New())
 ### Recommendation
 
 **Start without API Gateway**, use Golang middleware:
+
 - Use Fiber's built-in middleware for most needs
 - Add Traefik as reverse proxy (lightweight, easy to configure)
 - Migrate to full API Gateway (Kong) only if/when needed
@@ -117,6 +121,7 @@ Open-source Identity and Access Management (IAM) solution by Red Hat/JBoss.
 #### Pros ✅
 
 **1. Feature-Rich Out of the Box**
+
 - OAuth2 / OpenID Connect support
 - SAML 2.0 support
 - Social login (Google, Facebook, GitHub, Apple, etc.)
@@ -127,23 +132,27 @@ Open-source Identity and Access Management (IAM) solution by Red Hat/JBoss.
 - Admin console (UI for managing users)
 
 **2. Security**
+
 - Industry-standard security practices
 - Regular security updates
 - Battle-tested by enterprise users
 - Compliance ready (GDPR, HIPAA)
 
 **3. Scalability**
+
 - Clustered deployment support
 - Horizontal scaling
 - Session replication
 
 **4. Extensibility**
+
 - Custom themes/branding
 - Custom authentication flows
 - REST APIs
 - Event listeners
 
 **5. Cost**
+
 - Free and open source
 - Large community support
 - Extensive documentation
@@ -151,23 +160,27 @@ Open-source Identity and Access Management (IAM) solution by Red Hat/JBoss.
 #### Cons ❌
 
 **1. Complexity**
+
 - Heavy Java application (requires JVM)
 - Steep learning curve
 - Complex configuration
 - Over-engineered for simple use cases
 
 **2. Infrastructure Requirements**
+
 - Requires separate deployment
 - Additional database (PostgreSQL recommended)
 - High memory usage (~512MB-1GB minimum)
 - Complex to set up and maintain
 
 **3. Performance**
+
 - Slower than lightweight solutions
 - Additional network hop for every auth request
 - Latency overhead
 
 **4. Overkill for MVP**
+
 - Most features won't be used initially
 - Simple JWT auth is sufficient for start
 - Adds unnecessary complexity early on
@@ -226,12 +239,14 @@ func AuthMiddleware() fiber.Handler {
 ### Recommendation
 
 **Phase 1 (Iteration 1-3): Custom Golang Auth**
+
 - Implement OAuth2 for Google (Week 3)
 - JWT tokens for sessions
 - Refresh token mechanism
 - Simple user table in PostgreSQL
 
 **Phase 2 (Iteration 4+): Evaluate Keycloak**
+
 - If we need MFA
 - If we need SSO across multiple apps
 - If we need enterprise features
@@ -249,12 +264,14 @@ Custom auth is designed to be OAuth2 compliant, so migrating to Keycloak later i
 #### Option 1: Freemium Model ✅ RECOMMENDED
 
 **Free Tier:**
+
 - Basic product search
 - Up to 5 shopping lists
 - Standard route optimization
 - Ads supported
 
 **Premium Tier ($4.99/month or $49/year):**
+
 - Unlimited shopping lists
 - Priority route optimization
 - Ad-free experience
@@ -264,6 +281,7 @@ Custom auth is designed to be OAuth2 compliant, so migrating to Keycloak later i
 - Premium support
 
 **Pro Tier ($9.99/month - for stores):**
+
 - Store owner dashboard
 - Promoted listings
 - Analytics
@@ -273,6 +291,7 @@ Custom auth is designed to be OAuth2 compliant, so migrating to Keycloak later i
 #### Option 2: Advertising Model
 
 **Revenue Streams:**
+
 - Display ads (Google AdSense)
 - Store promotions (featured stores)
 - Sponsored products
@@ -281,6 +300,7 @@ Custom auth is designed to be OAuth2 compliant, so migrating to Keycloak later i
 #### Option 3: B2B Model
 
 **Services for Stores:**
+
 - API access for price integration
 - Analytics dashboard
 - Customer insights
@@ -410,11 +430,13 @@ POST   /api/v1/ads/:id/click
 ### Implementation in Iteration Plan
 
 **Iteration 3: Add Basic Monetization**
+
 - Subscription plans table
 - Free vs Premium tiers
 - Stripe integration for payments
 
 **Iteration 5: Advanced Monetization**
+
 - Advertisement system
 - Store promotions
 - Analytics dashboard
@@ -426,6 +448,7 @@ POST   /api/v1/ads/:id/click
 ### Feature Overview
 
 Provide intelligent autocomplete based on:
+
 1. User's own search history
 2. Popular searches globally
 3. Contextual suggestions (location-based)
@@ -497,22 +520,22 @@ DELETE /api/v1/search/history/:userId
 ```go
 func GetAutocompleteS suggestions(query string, userID string) ([]Suggestion, error) {
     suggestions := []Suggestion{}
-    
+
     // 1. User's recent searches (personalized)
     userHistory := getUserSearchHistory(userID, query, 3)
     suggestions = append(suggestions, userHistory...)
-    
+
     // 2. Popular searches matching query
     popularSearches := getPopularSearches(query, 5)
     suggestions = append(suggestions, popularSearches...)
-    
+
     // 3. Product names matching query (with fuzzy)
     productMatches := fuzzySearchProducts(query, 5)
     suggestions = append(suggestions, productMatches...)
-    
+
     // 4. Remove duplicates and rank
     suggestions = deduplicateAndRank(suggestions)
-    
+
     return suggestions[:10], nil // Top 10
 }
 ```
@@ -520,16 +543,19 @@ func GetAutocompleteS suggestions(query string, userID string) ([]Suggestion, er
 ### Implementation Timeline
 
 **Iteration 2: Basic Search History**
+
 - Track user searches
 - Simple history endpoint
 - Clear history function
 
 **Iteration 3: Autocomplete**
+
 - Autocomplete API
 - User history-based suggestions
 - Popular searches
 
 **Iteration 4: Advanced**
+
 - Trending algorithm
 - Context-aware suggestions
 - A/B testing for ranking
@@ -541,6 +567,7 @@ func GetAutocompleteS suggestions(query string, userID string) ([]Suggestion, er
 ### Requirement
 
 Support typo-tolerant, similarity-based search for Spanish language:
+
 - "huevos" → "huebos", "uevos", "huvos", "huevós"
 
 ### Technology Options
@@ -548,6 +575,7 @@ Support typo-tolerant, similarity-based search for Spanish language:
 #### Option 1: PostgreSQL pg_trgm Extension ✅ RECOMMENDED
 
 **Why:**
+
 - Built into PostgreSQL
 - Trigram-based similarity
 - Fast with GIN indexes
@@ -575,11 +603,11 @@ CREATE INDEX products_name_search_idx ON products USING GIN (
 
 ```sql
 -- Fuzzy search with similarity threshold
-SELECT 
+SELECT
     p.*,
     similarity(unaccent(lower(p.name)), unaccent(lower($1))) as sim_score
 FROM products p
-WHERE 
+WHERE
     unaccent(lower(p.name)) % unaccent(lower($1))  -- Similarity operator
     OR unaccent(lower(p.name)) LIKE '%' || unaccent(lower($1)) || '%'
 ORDER BY sim_score DESC, p.name
@@ -602,23 +630,24 @@ type FuzzySearchParams struct {
 
 func (r *ProductRepository) FuzzySearch(params FuzzySearchParams) ([]Product, error) {
     query := `
-        SELECT 
+        SELECT
             id, name, description, price, category_id,
             similarity(unaccent(lower(name)), unaccent(lower($1))) as sim_score
         FROM products
-        WHERE 
+        WHERE
             similarity(unaccent(lower(name)), unaccent(lower($1))) > $2
             OR unaccent(lower(name)) LIKE '%' || unaccent(lower($1)) || '%'
         ORDER BY sim_score DESC, name
         LIMIT $3
     `
-    
+
     rows, err := r.db.Query(query, params.Query, params.SimilarityThreshold, params.Limit)
     // Process results...
 }
 ```
 
 **Features:**
+
 - ✅ Handles typos: "huebos" → "huevos"
 - ✅ Handles missing letters: "uevos" → "huevos"
 - ✅ Handles accents: "huevós" → "huevos"
@@ -628,6 +657,7 @@ func (r *ProductRepository) FuzzySearch(params FuzzySearchParams) ([]Product, er
 #### Option 2: Elasticsearch (Future Enhancement)
 
 **When to Use:**
+
 - After 100K+ products
 - Need advanced features (faceted search, analytics)
 - Multi-language support
@@ -638,6 +668,7 @@ func (r *ProductRepository) FuzzySearch(params FuzzySearchParams) ([]Product, er
 ### Implementation in Iteration 1
 
 **Week 2: Database Setup**
+
 ```bash
 # Add to migration
 CREATE EXTENSION pg_trgm;
@@ -646,6 +677,7 @@ CREATE INDEX products_name_search_idx ON products USING GIN (unaccent(lower(name
 ```
 
 **Week 4: Search Implementation**
+
 ```go
 // Add fuzzy search to product service
 // Test with various typos
@@ -655,6 +687,7 @@ CREATE INDEX products_name_search_idx ON products USING GIN (unaccent(lower(name
 ### Search Quality Metrics
 
 Monitor and optimize:
+
 ```sql
 -- Track search effectiveness
 CREATE TABLE search_quality_metrics (
@@ -674,16 +707,16 @@ CREATE TABLE search_quality_metrics (
 
 ## Summary of Recommendations
 
-| Feature | Recommendation | Timeline |
-|---------|---------------|----------|
-| **API Gateway** | Start without (use Fiber middleware) | Add later if needed |
-| **Authentication** | Custom Golang OAuth2 | Iteration 1, Week 3 |
-| **Keycloak** | Not needed for MVP | Evaluate post-launch |
-| **Monetization** | Freemium model | Iteration 3 (basic), 5 (advanced) |
-| **Search History** | PostgreSQL + caching | Iteration 2 |
-| **Autocomplete** | History + Popular + Fuzzy | Iteration 3 |
-| **Fuzzy Search** | PostgreSQL pg_trgm | Iteration 1, Week 2 ✅ |
-| **Database for Auth** | SQLC (not Drizzle) | Golang-native |
+| Feature               | Recommendation                       | Timeline                          |
+| --------------------- | ------------------------------------ | --------------------------------- |
+| **API Gateway**       | Start without (use Fiber middleware) | Add later if needed               |
+| **Authentication**    | Custom Golang OAuth2                 | Iteration 1, Week 3               |
+| **Keycloak**          | Not needed for MVP                   | Evaluate post-launch              |
+| **Monetization**      | Freemium model                       | Iteration 3 (basic), 5 (advanced) |
+| **Search History**    | PostgreSQL + caching                 | Iteration 2                       |
+| **Autocomplete**      | History + Popular + Fuzzy            | Iteration 3                       |
+| **Fuzzy Search**      | PostgreSQL pg_trgm                   | Iteration 1, Week 2 ✅            |
+| **Database for Auth** | SQLC (not Drizzle)                   | Golang-native                     |
 
 ---
 
