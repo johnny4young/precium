@@ -246,10 +246,10 @@ func TestProductService_FindAll(t *testing.T) {
     // Setup
     ctx := context.Background()
     service := NewService(mockQueries)
-    
+
     // Execute
     products, err := service.FindAll(ctx, ProductFilters{})
-    
+
     // Assert
     assert.NoError(t, err)
     assert.NotNil(t, products)
@@ -259,14 +259,14 @@ func TestProductService_FindAll(t *testing.T) {
 func TestProductService_Create(t *testing.T) {
     ctx := context.Background()
     service := NewService(mockQueries)
-    
+
     dto := CreateProductDTO{
         Name:  "Test Product",
         Price: 9.99,
     }
-    
+
     product, err := service.Create(ctx, dto)
-    
+
     assert.NoError(t, err)
     assert.Equal(t, "Test Product", product.Name)
 }
@@ -305,7 +305,7 @@ describe('ProductService', () => {
       repository.find.mockReturnValue(mockProducts);
 
       const result = await service.findAll();
-      
+
       expect(result).toEqual(mockProducts);
       expect(repository.find).toHaveBeenCalledTimes(1);
     });
@@ -314,7 +314,7 @@ describe('ProductService', () => {
       repository.find.mockReturnValue([]);
 
       const result = await service.findAll();
-      
+
       expect(result).toEqual([]);
     });
   });
@@ -339,18 +339,18 @@ import (
 func TestProductsHandler_GetAll(t *testing.T) {
     // Setup
     app := setupTestApp()
-    
+
     // Create request
     req := httptest.NewRequest("GET", "/api/v1/products", nil)
     req.Header.Set("Authorization", "Bearer "+testToken)
-    
+
     // Execute
     resp, err := app.Test(req)
-    
+
     // Assert
     assert.NoError(t, err)
     assert.Equal(t, 200, resp.StatusCode)
-    
+
     var result ProductsResponse
     json.NewDecoder(resp.Body).Decode(&result)
     assert.NotEmpty(t, result.Data)
@@ -372,21 +372,29 @@ test.describe('Product Search', () => {
     await page.fill('[data-testid="search-input"]', 'milk');
     await page.click('[data-testid="search-button"]');
 
-    await expect(page.locator('[data-testid="product-card"]').first()).toBeVisible();
-    
-    const productCount = await page.locator('[data-testid="product-card"]').count();
+    await expect(
+      page.locator('[data-testid="product-card"]').first()
+    ).toBeVisible();
+
+    const productCount = await page
+      .locator('[data-testid="product-card"]')
+      .count();
     expect(productCount).toBeGreaterThan(0);
   });
 
   test('should filter by location', async ({ page }) => {
     // Mock geolocation
     await page.context().grantPermissions(['geolocation']);
-    await page.context().setGeolocation({ latitude: 40.7128, longitude: -74.0060 });
+    await page
+      .context()
+      .setGeolocation({ latitude: 40.7128, longitude: -74.006 });
 
     await page.fill('[data-testid="search-input"]', 'bread');
     await page.click('[data-testid="search-button"]');
 
-    await expect(page.locator('[data-testid="distance-label"]').first()).toContainText('km');
+    await expect(
+      page.locator('[data-testid="distance-label"]').first()
+    ).toContainText('km');
   });
 });
 ```
@@ -455,15 +463,18 @@ Closes #123"
 
 ```markdown
 ## Description
+
 Brief description of changes
 
 ## Type of Change
+
 - [ ] Bug fix
 - [ ] New feature
 - [ ] Breaking change
 - [ ] Documentation update
 
 ## Checklist
+
 - [ ] Code follows style guidelines
 - [ ] Self-review completed
 - [ ] Comments added for complex code
@@ -473,9 +484,11 @@ Brief description of changes
 - [ ] No new warnings
 
 ## Testing
+
 Describe testing done
 
 ## Screenshots (if applicable)
+
 Add screenshots for UI changes
 ```
 
@@ -660,7 +673,7 @@ import "github.com/rs/zerolog/log"
 log.Debug().
     Str("productId", productID).
     Msg("Processing product")
-    
+
 log.Error().
     Err(err).
     Msg("Failed to save")

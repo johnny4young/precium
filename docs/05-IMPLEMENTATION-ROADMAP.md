@@ -12,25 +12,27 @@ This roadmap breaks down the Precium implementation into 6 iterative phases, eac
 
 ## Iteration Overview
 
-| Iteration | Duration | Focus | Deliverable |
-|-----------|----------|-------|-------------|
-| 1 | 4 weeks | Foundation & Auth | Working monorepo, auth system |
-| 2 | 4 weeks | Core Search | Product/store search by location |
-| 3 | 5 weeks | Shopping Lists & Prices | Lists, price management |
-| 4 | 5 weeks | Route Optimization | Smart route planning |
-| 5 | 5 weeks | Receipt Scanning | OCR integration |
-| 6 | 5 weeks | Polish & Launch | Performance, testing, deployment |
+| Iteration | Duration | Focus                   | Deliverable                      |
+| --------- | -------- | ----------------------- | -------------------------------- |
+| 1         | 4 weeks  | Foundation & Auth       | Working monorepo, auth system    |
+| 2         | 4 weeks  | Core Search             | Product/store search by location |
+| 3         | 5 weeks  | Shopping Lists & Prices | Lists, price management          |
+| 4         | 5 weeks  | Route Optimization      | Smart route planning             |
+| 5         | 5 weeks  | Receipt Scanning        | OCR integration                  |
+| 6         | 5 weeks  | Polish & Launch         | Performance, testing, deployment |
 
 ---
 
 ## Iteration 1: Foundation & Authentication (Weeks 1-4)
 
 ### Goal
+
 Set up the project infrastructure, development environment, and implement authentication.
 
 ### Deliverables
 
 #### Week 1: Project Setup
+
 - [x] Initialize monorepo with npm workspaces + Vite
 - [x] Set up folder structure (apps/ and packages/)
 - [x] Configure TypeScript with path aliases (frontend only)
@@ -43,6 +45,7 @@ Set up the project infrastructure, development environment, and implement authen
 - [x] Set up CI/CD pipeline (GitHub Actions)
 
 **Key Files**:
+
 ```
 /package.json (workspace config)
 /docker-compose.yml
@@ -50,6 +53,7 @@ Set up the project infrastructure, development environment, and implement authen
 ```
 
 #### Week 2: Backend Foundation
+
 - [ ] Set up Golang backend application with Fiber
 - [ ] Configure database connection with SQLC
 - [ ] Implement database migrations (golang-migrate)
@@ -61,12 +65,14 @@ Set up the project infrastructure, development environment, and implement authen
 - [ ] Write unit test infrastructure
 
 **Endpoints**:
+
 ```
 GET  /health
 GET  /api/v1/docs
 ```
 
 #### Week 3: Authentication System
+
 - [ ] Implement JWT authentication
 - [ ] Set up golang.org/x/oauth2
 - [ ] Implement Google OAuth
@@ -78,6 +84,7 @@ GET  /api/v1/docs
 - [ ] Implement rate limiting
 
 **Endpoints**:
+
 ```
 POST /api/v1/auth/register
 POST /api/v1/auth/login
@@ -89,6 +96,7 @@ POST /api/v1/auth/logout
 ```
 
 #### Week 4: Frontend Foundation
+
 - [ ] Set up React web app (Vite)
 - [ ] Configure Tailwind CSS
 - [ ] Set up routing (React Router)
@@ -102,6 +110,7 @@ POST /api/v1/auth/logout
 - [ ] Implement mobile authentication screens
 
 ### Success Criteria
+
 - ✅ Users can register/login via email or Google
 - ✅ JWT tokens are issued and validated
 - ✅ Protected routes work on web and mobile
@@ -109,6 +118,7 @@ POST /api/v1/auth/logout
 - ✅ CI/CD pipeline is green
 
 ### Tech Stack Decisions
+
 - Backend: Golang + Fiber
 - Database: SQLC (type-safe SQL code generation)
 - Frontend: React + TypeScript + Tailwind
@@ -120,11 +130,13 @@ POST /api/v1/auth/logout
 ## Iteration 2: Core Search Features (Weeks 5-8)
 
 ### Goal
+
 Implement product and store search with location-based queries.
 
 ### Deliverables
 
 #### Week 5: Database & Seed Data
+
 - [ ] Complete database schema for stores and products
 - [ ] Implement PostGIS spatial indexes
 - [ ] Create database seeders with sample data
@@ -135,11 +147,13 @@ Implement product and store search with location-based queries.
 - [ ] Create migration for initial data
 
 **Key Tables**:
+
 ```sql
 stores, products, categories, prices
 ```
 
 #### Week 6: Backend Search APIs
+
 - [ ] Implement store search service
 - [ ] Implement product search service
 - [ ] Add PostGIS distance calculations
@@ -151,6 +165,7 @@ stores, products, categories, prices
 - [ ] Write comprehensive tests
 
 **Endpoints**:
+
 ```
 GET /api/v1/search/stores
 GET /api/v1/search/products
@@ -163,6 +178,7 @@ GET /api/v1/stores/:id/products
 ```
 
 #### Week 7: Web Search Interface
+
 - [ ] Create map component (Google Maps/Mapbox)
 - [ ] Implement geolocation
 - [ ] Create product search interface
@@ -174,6 +190,7 @@ GET /api/v1/stores/:id/products
 - [ ] Implement search filters
 
 **Pages**:
+
 ```
 /search
 /products/:id
@@ -181,6 +198,7 @@ GET /api/v1/stores/:id/products
 ```
 
 #### Week 8: Mobile Search Interface
+
 - [ ] Implement mobile map view
 - [ ] Add geolocation permissions
 - [ ] Create product search screen
@@ -192,6 +210,7 @@ GET /api/v1/stores/:id/products
 - [ ] Optimize for mobile performance
 
 ### Success Criteria
+
 - ✅ Users can search products by name
 - ✅ Search results show nearest stores
 - ✅ Map displays store locations
@@ -204,11 +223,13 @@ GET /api/v1/stores/:id/products
 ## Iteration 3: Shopping Lists & Price Management (Weeks 9-13)
 
 ### Goal
+
 Enable users to create shopping lists and manage prices.
 
 ### Deliverables
 
 #### Week 9: Shopping Lists Backend
+
 - [ ] Create shopping lists schema
 - [ ] Implement shopping list CRUD APIs
 - [ ] Add list items management
@@ -218,6 +239,7 @@ Enable users to create shopping lists and manage prices.
 - [ ] Write tests for list operations
 
 **Endpoints**:
+
 ```
 GET    /api/v1/shopping-lists
 POST   /api/v1/shopping-lists
@@ -230,6 +252,7 @@ DELETE /api/v1/shopping-lists/:listId/items/:itemId
 ```
 
 #### Week 10: Price Management Backend
+
 - [ ] Implement price creation/update APIs
 - [ ] Add price history tracking
 - [ ] Create price verification system
@@ -239,6 +262,7 @@ DELETE /api/v1/shopping-lists/:listId/items/:itemId
 - [ ] Write price management tests
 
 **Endpoints**:
+
 ```
 GET  /api/v1/prices/product/:productId/store/:storeId
 GET  /api/v1/prices/product/:productId/history
@@ -247,6 +271,7 @@ GET  /api/v1/prices/trends
 ```
 
 #### Week 11: Shopping Lists Frontend (Web)
+
 - [ ] Create shopping lists page
 - [ ] Implement list creation UI
 - [ ] Add item addition interface
@@ -257,6 +282,7 @@ GET  /api/v1/prices/trends
 - [ ] Add list deletion with confirmation
 
 **Pages**:
+
 ```
 /lists
 /lists/:id
@@ -264,6 +290,7 @@ GET  /api/v1/prices/trends
 ```
 
 #### Week 12: Shopping Lists Mobile
+
 - [ ] Create lists screen
 - [ ] Implement swipe actions
 - [ ] Add item quick-add
@@ -273,6 +300,7 @@ GET  /api/v1/prices/trends
 - [ ] Optimize for one-handed use
 
 #### Week 13: Price Contribution Features
+
 - [ ] Create "Report Price" feature
 - [ ] Add price update form
 - [ ] Implement price verification flow
@@ -282,6 +310,7 @@ GET  /api/v1/prices/trends
 - [ ] Add admin moderation dashboard
 
 ### Success Criteria
+
 - ✅ Users can create and manage shopping lists
 - ✅ Lists show estimated costs
 - ✅ Users can contribute price updates
@@ -293,11 +322,13 @@ GET  /api/v1/prices/trends
 ## Iteration 4: Route Optimization (Weeks 14-18)
 
 ### Goal
+
 Implement smart shopping route optimization.
 
 ### Deliverables
 
 #### Week 14: Route Optimization Algorithm
+
 - [ ] Research TSP algorithms
 - [ ] Implement nearest neighbor algorithm
 - [ ] Add 2-opt optimization
@@ -309,6 +340,7 @@ Implement smart shopping route optimization.
 - [ ] Benchmark performance
 
 **Algorithm Considerations**:
+
 ```go
 // For small sets (< 10 stores): Exact solutions possible
 // For larger sets: Approximation algorithms
@@ -318,6 +350,7 @@ Implement smart shopping route optimization.
 ```
 
 #### Week 15: Route Optimization Backend
+
 - [ ] Create route optimization service
 - [ ] Integrate with Google Maps Directions API
 - [ ] Implement route caching
@@ -328,6 +361,7 @@ Implement smart shopping route optimization.
 - [ ] Write integration tests
 
 **Endpoints**:
+
 ```
 POST /api/v1/routes/optimize
 GET  /api/v1/routes/:id
@@ -335,6 +369,7 @@ GET  /api/v1/routes/:id/navigation
 ```
 
 #### Week 16: Route Optimization UI (Web)
+
 - [ ] Create route planning page
 - [ ] Add product selection from list
 - [ ] Display route on map
@@ -346,12 +381,14 @@ GET  /api/v1/routes/:id/navigation
 - [ ] Add "Start Navigation" button
 
 **Pages**:
+
 ```
 /routes/plan
 /routes/:id
 ```
 
 #### Week 17: Route Optimization Mobile
+
 - [ ] Create route planning screen
 - [ ] Implement turn-by-turn navigation
 - [ ] Add GPS tracking
@@ -362,6 +399,7 @@ GET  /api/v1/routes/:id/navigation
 - [ ] Optimize battery usage
 
 #### Week 18: Route Features Polish
+
 - [ ] Add route history
 - [ ] Implement route sharing
 - [ ] Add favorite routes
@@ -372,6 +410,7 @@ GET  /api/v1/routes/:id/navigation
 - [ ] User testing and refinement
 
 ### Success Criteria
+
 - ✅ System generates optimal routes
 - ✅ Two modes work correctly (price vs distance)
 - ✅ Routes display clearly on map
@@ -384,11 +423,13 @@ GET  /api/v1/routes/:id/navigation
 ## Iteration 5: Receipt Scanning & OCR (Weeks 19-23)
 
 ### Goal
+
 Enable users to scan receipts and contribute price data.
 
 ### Deliverables
 
 #### Week 19: OCR Backend Setup
+
 - [ ] Integrate Google Vision API
 - [ ] Set up image storage (S3/GCS)
 - [ ] Create OCR job queue (Bull)
@@ -399,6 +440,7 @@ Enable users to scan receipts and contribute price data.
 - [ ] Write OCR service tests
 
 **External Services**:
+
 ```
 - Google Vision API for OCR
 - AWS S3 or Google Cloud Storage for images
@@ -406,6 +448,7 @@ Enable users to scan receipts and contribute price data.
 ```
 
 #### Week 20: OCR Processing Logic
+
 - [ ] Implement product name extraction
 - [ ] Add price extraction
 - [ ] Create store detection
@@ -417,6 +460,7 @@ Enable users to scan receipts and contribute price data.
 - [ ] Handle various receipt formats
 
 **Pattern Recognition**:
+
 ```go
 // Detect common patterns:
 // - Store name at top
@@ -427,6 +471,7 @@ Enable users to scan receipts and contribute price data.
 ```
 
 #### Week 21: OCR Review System
+
 - [ ] Create OCR job review API
 - [ ] Implement approval workflow
 - [ ] Add correction interface
@@ -437,6 +482,7 @@ Enable users to scan receipts and contribute price data.
 - [ ] Write review tests
 
 **Endpoints**:
+
 ```
 POST /api/v1/ocr/upload
 GET  /api/v1/ocr/jobs/:id
@@ -445,6 +491,7 @@ GET  /api/v1/ocr/pending
 ```
 
 #### Week 22: Receipt Scanning Mobile UI
+
 - [ ] Create camera interface
 - [ ] Implement image capture
 - [ ] Add image preview
@@ -456,6 +503,7 @@ GET  /api/v1/ocr/pending
 - [ ] Implement retry logic
 
 **Screens**:
+
 ```
 /scan
 /scan/preview
@@ -464,6 +512,7 @@ GET  /api/v1/ocr/pending
 ```
 
 #### Week 23: OCR Web Interface & Polish
+
 - [ ] Create web upload interface
 - [ ] Implement drag-and-drop
 - [ ] Add admin review dashboard
@@ -475,6 +524,7 @@ GET  /api/v1/ocr/pending
 - [ ] Handle error cases
 
 ### Success Criteria
+
 - ✅ Users can scan receipts on mobile
 - ✅ OCR extracts products and prices (>80% accuracy)
 - ✅ Store names are detected
@@ -487,11 +537,13 @@ GET  /api/v1/ocr/pending
 ## Iteration 6: Polish, Performance & Launch (Weeks 24-28)
 
 ### Goal
+
 Prepare the application for production launch.
 
 ### Deliverables
 
 #### Week 24: Performance Optimization
+
 - [ ] Database query optimization
 - [ ] Add strategic indexes
 - [ ] Implement query result caching
@@ -504,6 +556,7 @@ Prepare the application for production launch.
 - [ ] Implement offline functionality
 
 **Performance Targets**:
+
 ```
 - API response: < 200ms (p95)
 - Page load: < 2s
@@ -512,6 +565,7 @@ Prepare the application for production launch.
 ```
 
 #### Week 25: Testing & Quality Assurance
+
 - [ ] Write missing unit tests (>80% coverage)
 - [ ] Create E2E tests (Cypress/Playwright)
 - [ ] Perform load testing (k6/Artillery)
@@ -523,6 +577,7 @@ Prepare the application for production launch.
 - [ ] Create bug fix process
 
 **Testing Goals**:
+
 ```
 - Unit test coverage: > 80%
 - E2E critical paths: 100%
@@ -532,6 +587,7 @@ Prepare the application for production launch.
 ```
 
 #### Week 26: Additional Features & Polish
+
 - [ ] Implement user preferences
 - [ ] Add dark mode
 - [ ] Create onboarding flow
@@ -544,6 +600,7 @@ Prepare the application for production launch.
 - [ ] Implement feature flags
 
 **Nice-to-Have Features**:
+
 ```
 - Favorite products/stores
 - Price alerts
@@ -554,6 +611,7 @@ Prepare the application for production launch.
 ```
 
 #### Week 27: Documentation & Deployment
+
 - [ ] Complete API documentation
 - [ ] Write user guides
 - [ ] Create admin documentation
@@ -566,6 +624,7 @@ Prepare the application for production launch.
 - [ ] Set up staging environment
 
 **Infrastructure**:
+
 ```
 - Production: AWS/GCP/Azure
 - Database: Managed PostgreSQL
@@ -576,6 +635,7 @@ Prepare the application for production launch.
 ```
 
 #### Week 28: Beta Launch & Iteration
+
 - [ ] Conduct beta testing
 - [ ] Gather user feedback
 - [ ] Fix critical issues
@@ -588,6 +648,7 @@ Prepare the application for production launch.
 - [ ] Launch! 🚀
 
 ### Success Criteria
+
 - ✅ Application meets performance targets
 - ✅ All critical tests pass
 - ✅ Security audit passed
@@ -601,6 +662,7 @@ Prepare the application for production launch.
 ## Post-Launch Roadmap (Future Iterations)
 
 ### Iteration 7: Advanced Features (Optional)
+
 - [ ] Apple OAuth integration
 - [ ] GitHub OAuth integration
 - [ ] Advanced route features (traffic, time windows)
@@ -611,6 +673,7 @@ Prepare the application for production launch.
 - [ ] Budget tracking
 
 ### Iteration 8: Scale & Optimize (Optional)
+
 - [ ] Implement Elasticsearch for search
 - [ ] Add GraphQL API (if needed)
 - [ ] Implement real-time updates (WebSockets)
@@ -624,6 +687,7 @@ Prepare the application for production launch.
 ## Resource Requirements
 
 ### Development Team
+
 ```
 - 1 Backend Developer (Golang)
 - 1 Frontend Developer (React)
@@ -633,6 +697,7 @@ Prepare the application for production launch.
 ```
 
 ### External Services Budget (Monthly)
+
 ```
 - Cloud Hosting: $100-500
 - Database: $50-200
@@ -644,6 +709,7 @@ Prepare the application for production launch.
 ```
 
 ### Development Tools
+
 ```
 - GitHub (Free for public repos)
 - Vercel/Netlify (Free tier)
@@ -658,40 +724,40 @@ Prepare the application for production launch.
 ### Technical Risks
 
 1. **Route Optimization Performance**
-   - *Risk*: Algorithm too slow for large datasets
-   - *Mitigation*: Implement timeout, use approximation algorithms, Golang provides excellent performance
-   
+   - _Risk_: Algorithm too slow for large datasets
+   - _Mitigation_: Implement timeout, use approximation algorithms, Golang provides excellent performance
 2. **OCR Accuracy**
-   - *Risk*: Low accuracy on receipts
-   - *Mitigation*: Use Google Vision API, implement review system, gather training data
+   - _Risk_: Low accuracy on receipts
+   - _Mitigation_: Use Google Vision API, implement review system, gather training data
 
 3. **Location Accuracy**
-   - *Risk*: GPS not accurate enough
-   - *Mitigation*: Use multiple location sources, allow manual correction
+   - _Risk_: GPS not accurate enough
+   - _Mitigation_: Use multiple location sources, allow manual correction
 
 4. **Database Performance**
-   - *Risk*: Slow queries with large datasets
-   - *Mitigation*: Proper indexing, caching, query optimization
+   - _Risk_: Slow queries with large datasets
+   - _Mitigation_: Proper indexing, caching, query optimization
 
 ### Business Risks
 
 1. **User Adoption**
-   - *Risk*: Users don't find value
-   - *Mitigation*: Beta testing, user feedback, iterate quickly
+   - _Risk_: Users don't find value
+   - _Mitigation_: Beta testing, user feedback, iterate quickly
 
 2. **Data Quality**
-   - *Risk*: Inaccurate prices harm trust
-   - *Mitigation*: Verification system, community moderation, trust scores
+   - _Risk_: Inaccurate prices harm trust
+   - _Mitigation_: Verification system, community moderation, trust scores
 
 3. **Store Relationships**
-   - *Risk*: Stores object to price comparison
-   - *Mitigation*: Focus on user-contributed data, terms of service
+   - _Risk_: Stores object to price comparison
+   - _Mitigation_: Focus on user-contributed data, terms of service
 
 ---
 
 ## Success Metrics
 
 ### Product Metrics
+
 - Daily Active Users (DAU)
 - Monthly Active Users (MAU)
 - User retention (Day 1, Day 7, Day 30)
@@ -701,6 +767,7 @@ Prepare the application for production launch.
 - Price contributions per week
 
 ### Technical Metrics
+
 - API response times (p50, p95, p99)
 - Error rates
 - Uptime (target: 99.9%)
@@ -708,6 +775,7 @@ Prepare the application for production launch.
 - Cache hit rates
 
 ### Business Metrics
+
 - User acquisition cost
 - Customer lifetime value
 - Revenue (if monetization)

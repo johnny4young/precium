@@ -22,6 +22,7 @@ A monorepo (monolithic repository) is a single repository containing multiple pr
 ### Pros
 
 ✅ **Code Sharing**
+
 - Easy to share TypeScript types between web and mobile
 - Single source of truth for API contracts
 - Shared components between web and mobile
@@ -29,30 +30,35 @@ A monorepo (monolithic repository) is a single repository containing multiple pr
 - Go packages can be shared between backend services
 
 ✅ **Simplified Dependency Management**
+
 - Single `package.json` or workspace configuration
 - Consistent versions across all projects
 - Easier to update shared dependencies
 - No version conflicts between projects
 
 ✅ **Atomic Changes**
+
 - Change API contract and update all clients in one commit
 - Single PR for cross-platform features
 - Easier to maintain consistency
 - Refactoring is simpler
 
 ✅ **Unified CI/CD**
+
 - Single CI/CD pipeline configuration
 - Easier to run tests for affected projects
 - Shared build cache
 - Consistent deployment processes
 
 ✅ **Better Developer Experience**
+
 - Single repository to clone
 - Easier onboarding for new developers
 - Jump between projects seamlessly
 - Consistent tooling and standards
 
 ✅ **Simplified Project Management**
+
 - Single issue tracker
 - Easier to track features across platforms
 - Unified project board
@@ -61,27 +67,32 @@ A monorepo (monolithic repository) is a single repository containing multiple pr
 ### Cons
 
 ❌ **Large Repository Size**
+
 - Longer clone times
 - More disk space required
 - Git operations can be slower
 
 ❌ **Complex Build System**
+
 - Mixed languages (Go + TypeScript) require different build tools
 - Frontend uses npm + Vite, backend uses Go toolchain
 - Need to coordinate builds across different ecosystems
 - npm workspaces + Vite simplify this compared to Turborepo
 
 ❌ **All-or-Nothing Access**
+
 - Can't restrict access to specific parts easily
 - All developers see all code
 - Security concerns if need separate permissions
 
 ❌ **Potential for Tight Coupling**
+
 - Risk of creating dependencies between unrelated projects
 - Can lead to poor architectural boundaries
 - Requires discipline to maintain separation
 
 ❌ **Learning Curve**
+
 - Team needs to learn monorepo tools
 - More complex than traditional repositories
 - Additional tooling overhead
@@ -93,6 +104,7 @@ A monorepo (monolithic repository) is a single repository containing multiple pr
 Multiple separate repositories, one for each major component (backend, web, mobile), with shared code potentially in separate libraries published to npm.
 
 ### Structure
+
 ```
 precium-backend/       (separate repo)
 precium-web/           (separate repo)
@@ -103,30 +115,35 @@ precium-shared/        (separate repo - npm package)
 ### Pros
 
 ✅ **Clear Separation**
+
 - Strong architectural boundaries
 - Each team owns their repository
 - Independent deployment cycles
 - Clear ownership and responsibilities
 
 ✅ **Simpler Individual Setup**
+
 - Smaller, faster repositories
 - Frontend developers only clone frontend
 - Backend developers only need backend
 - Quicker onboarding per project
 
 ✅ **Independent Scaling**
+
 - Teams can work independently
 - Different CI/CD pipelines
 - Technology choices per repo
 - Different release schedules
 
 ✅ **Granular Access Control**
+
 - Can restrict access per repository
 - Different security levels
 - Separate deployment credentials
 - Better security isolation
 
 ✅ **No Special Tooling**
+
 - Standard Git workflows
 - Traditional npm packages
 - Well-known patterns
@@ -135,30 +152,35 @@ precium-shared/        (separate repo - npm package)
 ### Cons
 
 ❌ **Code Duplication**
+
 - Harder to share code
 - Duplicated types and interfaces
 - Validation logic in multiple places
 - Utilities copied between projects
 
 ❌ **Version Management Nightmare**
+
 - Keeping shared packages in sync
 - Breaking changes require coordination
 - Multiple PR workflows for single feature
 - Difficult to ensure consistency
 
 ❌ **Complex Cross-Project Changes**
+
 - Need multiple PRs for single feature
 - Coordination between teams required
 - Testing changes across projects is harder
 - More time to implement cross-cutting features
 
 ❌ **Scattered Developer Experience**
+
 - Clone multiple repositories
 - Switch between projects constantly
 - Different tooling per project
 - Harder to maintain consistency
 
 ❌ **Dependency Hell**
+
 - Package version conflicts
 - Need to publish shared packages
 - Circular dependencies possible
@@ -227,11 +249,7 @@ precium/                          (monorepo root)
 {
   "name": "precium",
   "private": true,
-  "workspaces": [
-    "apps/web",
-    "apps/mobile",
-    "packages/*"
-  ],
+  "workspaces": ["apps/web", "apps/mobile", "packages/*"],
   "scripts": {
     "dev": "npm run dev --workspace=apps/web",
     "dev:backend": "cd apps/backend && air",
@@ -242,6 +260,7 @@ precium/                          (monorepo root)
 ```
 
 **Why npm Workspaces + Vite?**
+
 - Native npm feature (no extra dependencies)
 - Simple configuration for mixed-language monorepo
 - Vite provides ultra-fast frontend builds with HMR
@@ -251,6 +270,7 @@ precium/                          (monorepo root)
 - Better suited when backend is different language
 
 **Backend Build (Golang):**
+
 ```bash
 # Development with hot reload
 cd apps/backend && air
@@ -260,6 +280,7 @@ cd apps/backend && go build -o bin/api ./cmd/api
 ```
 
 **Frontend Build (Vite):**
+
 ```bash
 # Development
 npm run dev --workspace=apps/web
@@ -271,6 +292,7 @@ npm run build --workspace=apps/web
 ### Benefits for Precium Specifically
 
 1. **Type Generation from API**
+
 ```bash
 # Generate TypeScript types from OpenAPI spec
 cd apps/backend && swag init
@@ -278,6 +300,7 @@ npx openapi-typescript ./docs/swagger.json -o ./packages/shared-types/src/api.ts
 ```
 
 2. **Shared Validation**
+
 ```typescript
 // packages/shared-types/src/index.ts
 export interface Product {
@@ -291,6 +314,7 @@ export interface Product {
 ```
 
 2. **Shared Validation**
+
 ```typescript
 // packages/validation/src/product.ts
 import { z } from 'zod';
@@ -298,13 +322,14 @@ import { z } from 'zod';
 export const productSchema = z.object({
   name: z.string().min(3),
   price: z.number().positive(),
-  storeId: z.string().uuid()
+  storeId: z.string().uuid(),
 });
 
 // Same validation on backend and frontend
 ```
 
 3. **Shared API Client**
+
 ```typescript
 // packages/api-client/src/index.ts
 export class PreciumAPI {
@@ -315,6 +340,7 @@ export class PreciumAPI {
 ```
 
 4. **Shared Components**
+
 ```typescript
 // packages/ui-components/src/ProductCard.tsx
 // Used by both web (React) and mobile (React Native)
@@ -323,16 +349,19 @@ export class PreciumAPI {
 ### Migration Path
 
 **Phase 1: Start with Monorepo** (Recommended)
+
 - Set up workspace structure
 - Implement MVP in monorepo
 - Benefit from code sharing immediately
 
 **Phase 2: Evaluate** (After 6 months)
+
 - If monorepo becomes problematic
 - If team grows significantly
 - If need separate access control
 
 **Phase 3: Split if Necessary** (Future)
+
 - Can always split later
 - Extract shared code to npm packages
 - Maintain git history
@@ -367,20 +396,19 @@ Consider multi-repo if:
 ### Phase 1: Setup Monorepo (Week 1)
 
 1. Initialize npm workspaces (native, no Turborepo needed)
+
 ```bash
 mkdir precium && cd precium
 npm init -y
 ```
 
 2. Configure workspaces in root `package.json`
+
 ```json
 {
   "name": "precium",
   "private": true,
-  "workspaces": [
-    "apps/*",
-    "packages/*"
-  ]
+  "workspaces": ["apps/*", "packages/*"]
 }
 ```
 
@@ -412,12 +440,14 @@ npm init -y
 ## Best Practices for Monorepo
 
 1. **Use Path Aliases**
+
 ```typescript
 import { Product } from '@precium/shared-types';
 import { validateProduct } from '@precium/validation';
 ```
 
 2. **Enforce Dependencies**
+
 ```json
 // turbo.json
 {
@@ -431,16 +461,19 @@ import { validateProduct } from '@precium/validation';
 ```
 
 3. **Shared Configuration**
+
 - Single ESLint config
 - Single Prettier config
 - Base TypeScript config
 
 4. **Documentation**
+
 - README in each package
 - Clear ownership
 - Contribution guidelines
 
 5. **Versioning**
+
 - Use Changesets for version management
 - Automated changelog generation
 - Coordinated releases

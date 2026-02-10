@@ -70,16 +70,16 @@ This document describes the scalable and configurable web scraping architecture 
 
 ## Technology Stack
 
-| Component | Technology | Version | Purpose |
-|-----------|-----------|---------|---------|
-| **Scraping** | Colly | v2.1+ | Web scraping framework |
-| **Scheduling** | gocron | v2.0+ | Cron job scheduler |
-| **Queue** | Asynq | v0.24+ | Redis-backed job queue |
-| **Parser** | goquery | v1.8+ | HTML parsing (jQuery-like) |
-| **Validation** | go-validator | v10.0+ | Data validation |
-| **Storage** | SQLC | Latest | Type-safe SQL queries |
-| **Config** | Viper | v1.18+ | Configuration management |
-| **Logging** | Zerolog | v1.32+ | Structured logging |
+| Component      | Technology   | Version | Purpose                    |
+| -------------- | ------------ | ------- | -------------------------- |
+| **Scraping**   | Colly        | v2.1+   | Web scraping framework     |
+| **Scheduling** | gocron       | v2.0+   | Cron job scheduler         |
+| **Queue**      | Asynq        | v0.24+  | Redis-backed job queue     |
+| **Parser**     | goquery      | v1.8+   | HTML parsing (jQuery-like) |
+| **Validation** | go-validator | v10.0+  | Data validation            |
+| **Storage**    | SQLC         | Latest  | Type-safe SQL queries      |
+| **Config**     | Viper        | v1.18+  | Configuration management   |
+| **Logging**    | Zerolog      | v1.32+  | Structured logging         |
 
 ---
 
@@ -100,13 +100,13 @@ import (
 type Scraper interface {
     // Name returns the scraper identifier
     Name() string
-    
+
     // Scrape executes the scraping job
     Scrape(ctx context.Context, params ScrapeParams) (*ScrapeResult, error)
-    
+
     // Validate validates scraper configuration
     Validate() error
-    
+
     // GetConfig returns scraper configuration
     GetConfig() *ScraperConfig
 }
@@ -168,7 +168,7 @@ import (
     "context"
     "fmt"
     "time"
-    
+
     "github.com/gocolly/colly/v2"
     "github.com/gocolly/colly/v2/extensions"
     "github.com/rs/zerolog/log"
@@ -188,25 +188,25 @@ func NewCollyScraper(config *ScraperConfig) *CollyScraper {
         colly.MaxDepth(2),
         colly.Async(true),
     )
-    
+
     // Rate limiting
     c.Limit(&colly.LimitRule{
         DomainGlob:  "*",
         Parallelism: 2,
         Delay:       time.Second / time.Duration(config.RateLimit),
     })
-    
+
     // Set custom headers
     for key, value := range config.Headers {
         c.OnRequest(func(r *colly.Request) {
             r.Headers.Set(key, value)
         })
     }
-    
+
     // Use random user agent extension
     extensions.RandomUserAgent(c)
     extensions.Referer(c)
-    
+
     return &CollyScraper{
         config:    config,
         collector: c,
@@ -224,7 +224,7 @@ func (s *CollyScraper) Scrape(ctx context.Context, params ScrapeParams) (*Scrape
             StartTime:   time.Now(),
         },
     }
-    
+
     // Product scraping
     s.collector.OnHTML(s.config.Selectors.ProductName, func(e *colly.HTMLElement) {
         product := s.extractProduct(e)
@@ -232,7 +232,7 @@ func (s *CollyScraper) Scrape(ctx context.Context, params ScrapeParams) (*Scrape
             result.Products = append(result.Products, product)
         }
     })
-    
+
     // Price scraping
     s.collector.OnHTML(s.config.Selectors.ProductPrice, func(e *colly.HTMLElement) {
         price := s.extractPrice(e)
@@ -240,7 +240,7 @@ func (s *CollyScraper) Scrape(ctx context.Context, params ScrapeParams) (*Scrape
             result.Prices = append(result.Prices, price)
         }
     })
-    
+
     // Promotion scraping
     s.collector.OnHTML(s.config.Selectors.Promotion, func(e *colly.HTMLElement) {
         promo := s.extractPromotion(e)
@@ -248,7 +248,7 @@ func (s *CollyScraper) Scrape(ctx context.Context, params ScrapeParams) (*Scrape
             result.Promotions = append(result.Promotions, promo)
         }
     })
-    
+
     // Error handling
     s.collector.OnError(func(r *colly.Response, err error) {
         log.Error().
@@ -258,20 +258,20 @@ func (s *CollyScraper) Scrape(ctx context.Context, params ScrapeParams) (*Scrape
             Err(err).
             Msg("Scraping error")
     })
-    
+
     // Visit the target URL
     err := s.collector.Visit(params.BuildURL(s.config.BaseURL))
     if err != nil {
         return nil, fmt.Errorf("failed to visit URL: %w", err)
     }
-    
+
     // Wait for all goroutines to finish
     s.collector.Wait()
-    
+
     result.Metadata.EndTime = time.Now()
     result.Metadata.Duration = result.Metadata.EndTime.Sub(result.Metadata.StartTime)
     result.Metadata.ItemsScraped = len(result.Products)
-    
+
     return result, nil
 }
 
@@ -290,7 +290,7 @@ func (s *CollyScraper) extractProduct(e *colly.HTMLElement) *Product {
 func (s *CollyScraper) extractPrice(e *colly.HTMLElement) *Price {
     priceText := e.Text
     amount := parsePrice(priceText) // utility function to parse price
-    
+
     return &Price{
         Amount:    amount,
         Currency:  "USD", // or detect from page
@@ -320,40 +320,40 @@ func (s *CollyScraper) extractPromotion(e *colly.HTMLElement) *Promotion {
 ```yaml
 # config/scrapers.yaml
 scrapers:
-  - name: "walmart"
+  - name: 'walmart'
     enabled: true
-    base_url: "https://www.walmart.com"
-    schedule: "0 */6 * * *"  # Every 6 hours
-    rate_limit: 5  # 5 requests per second
+    base_url: 'https://www.walmart.com'
+    schedule: '0 */6 * * *' # Every 6 hours
+    rate_limit: 5 # 5 requests per second
     timeout: 30s
     max_retries: 3
     retry_delay: 5s
-    user_agent: "Mozilla/5.0 (compatible; PreciumBot/1.0)"
+    user_agent: 'Mozilla/5.0 (compatible; PreciumBot/1.0)'
     headers:
-      Accept-Language: "en-US,en;q=0.9"
-      Accept: "text/html,application/xhtml+xml"
+      Accept-Language: 'en-US,en;q=0.9'
+      Accept: 'text/html,application/xhtml+xml'
     selectors:
-      product_name: ".product-title"
-      product_price: ".price-main .price-characteristic"
-      product_image: ".product-image img"
-      product_url: ".product-link"
-      promotion: ".product-savings"
-      pagination: ".pagination-next"
+      product_name: '.product-title'
+      product_price: '.price-main .price-characteristic'
+      product_image: '.product-image img'
+      product_url: '.product-link'
+      promotion: '.product-savings'
+      pagination: '.pagination-next'
     categories:
-      - "groceries"
-      - "electronics"
+      - 'groceries'
+      - 'electronics'
     proxy_enabled: false
     javascript_enabled: false
 
-  - name: "target"
+  - name: 'target'
     enabled: true
-    base_url: "https://www.target.com"
-    schedule: "30 */6 * * *"  # Every 6 hours, offset by 30 minutes
+    base_url: 'https://www.target.com'
+    schedule: '30 */6 * * *' # Every 6 hours, offset by 30 minutes
     rate_limit: 3
     timeout: 45s
     max_retries: 3
     retry_delay: 10s
-    user_agent: "Mozilla/5.0 (compatible; PreciumBot/1.0)"
+    user_agent: 'Mozilla/5.0 (compatible; PreciumBot/1.0)'
     selectors:
       product_name: "h3[data-test='product-title']"
       product_price: "span[data-test='product-price']"
@@ -361,18 +361,18 @@ scrapers:
       product_url: "a[data-test='product-link']"
       promotion: "div[data-test='promotion-badge']"
     categories:
-      - "groceries"
-    javascript_enabled: true  # Target might need JS rendering
+      - 'groceries'
+    javascript_enabled: true # Target might need JS rendering
 
-  - name: "amazon"
-    enabled: false  # Disabled for now (requires more sophisticated setup)
-    base_url: "https://www.amazon.com"
-    schedule: "0 */12 * * *"
+  - name: 'amazon'
+    enabled: false # Disabled for now (requires more sophisticated setup)
+    base_url: 'https://www.amazon.com'
+    schedule: '0 */12 * * *'
     rate_limit: 2
     timeout: 60s
     max_retries: 5
     retry_delay: 15s
-    proxy_enabled: true  # Amazon often blocks scrapers
+    proxy_enabled: true # Amazon often blocks scrapers
 ```
 
 ### Configuration Loader
@@ -383,7 +383,7 @@ package config
 
 import (
     "fmt"
-    
+
     "github.com/spf13/viper"
 )
 
@@ -397,27 +397,27 @@ func NewScraperConfigManager(configPath string) (*ScraperConfigManager, error) {
     v := viper.New()
     v.SetConfigFile(configPath)
     v.SetConfigType("yaml")
-    
+
     if err := v.ReadInConfig(); err != nil {
         return nil, fmt.Errorf("failed to read config: %w", err)
     }
-    
+
     var cfg struct {
         Scrapers []*ScraperConfig `mapstructure:"scrapers"`
     }
-    
+
     if err := v.Unmarshal(&cfg); err != nil {
         return nil, fmt.Errorf("failed to unmarshal config: %w", err)
     }
-    
+
     manager := &ScraperConfigManager{
         configs: make(map[string]*ScraperConfig),
     }
-    
+
     for _, scraperCfg := range cfg.Scrapers {
         manager.configs[scraperCfg.Name] = scraperCfg
     }
-    
+
     return manager, nil
 }
 
@@ -456,7 +456,7 @@ import (
     "context"
     "fmt"
     "time"
-    
+
     "github.com/go-co-op/gocron/v2"
     "github.com/rs/zerolog/log"
 )
@@ -474,7 +474,7 @@ func NewScraperScheduler(scrapers map[string]Scraper, queue JobQueue) (*ScraperS
     if err != nil {
         return nil, fmt.Errorf("failed to create scheduler: %w", err)
     }
-    
+
     return &ScraperScheduler{
         scheduler: s,
         scrapers:  scrapers,
@@ -489,13 +489,13 @@ func (s *ScraperScheduler) ScheduleScrapers(configs []*ScraperConfig) error {
             log.Info().Str("scraper", cfg.Name).Msg("Scraper disabled, skipping")
             continue
         }
-        
+
         scraper, exists := s.scrapers[cfg.Name]
         if !exists {
             log.Warn().Str("scraper", cfg.Name).Msg("Scraper not found, skipping")
             continue
         }
-        
+
         // Schedule the job
         _, err := s.scheduler.NewJob(
             gocron.CronJob(cfg.Schedule, false),
@@ -503,17 +503,17 @@ func (s *ScraperScheduler) ScheduleScrapers(configs []*ScraperConfig) error {
             gocron.WithName(cfg.Name),
             gocron.WithTags(cfg.Name, "scraper"),
         )
-        
+
         if err != nil {
             return fmt.Errorf("failed to schedule scraper %s: %w", cfg.Name, err)
         }
-        
+
         log.Info().
             Str("scraper", cfg.Name).
             Str("schedule", cfg.Schedule).
             Msg("Scraper scheduled successfully")
     }
-    
+
     return nil
 }
 
@@ -521,9 +521,9 @@ func (s *ScraperScheduler) ScheduleScrapers(configs []*ScraperConfig) error {
 func (s *ScraperScheduler) runScraper(scraper Scraper, config *ScraperConfig) {
     ctx, cancel := context.WithTimeout(context.Background(), config.Timeout)
     defer cancel()
-    
+
     log.Info().Str("scraper", config.Name).Msg("Starting scraping job")
-    
+
     // Enqueue the job for processing by workers
     job := &ScrapeJob{
         ScraperName: config.Name,
@@ -533,7 +533,7 @@ func (s *ScraperScheduler) runScraper(scraper Scraper, config *ScraperConfig) {
         },
         EnqueuedAt: time.Now(),
     }
-    
+
     if err := s.queue.Enqueue(ctx, job); err != nil {
         log.Error().
             Str("scraper", config.Name).
@@ -541,7 +541,7 @@ func (s *ScraperScheduler) runScraper(scraper Scraper, config *ScraperConfig) {
             Msg("Failed to enqueue scraping job")
         return
     }
-    
+
     log.Info().
         Str("scraper", config.Name).
         Msg("Scraping job enqueued successfully")
@@ -574,7 +574,7 @@ import (
     "encoding/json"
     "fmt"
     "time"
-    
+
     "github.com/hibiken/asynq"
     "github.com/rs/zerolog/log"
 )
@@ -592,7 +592,7 @@ type AsynqQueue struct {
 // NewAsynqQueue creates a new Asynq-based job queue
 func NewAsynqQueue(redisAddr string) *AsynqQueue {
     redisOpt := asynq.RedisClientOpt{Addr: redisAddr}
-    
+
     return &AsynqQueue{
         client: asynq.NewClient(redisOpt),
         server: asynq.NewServer(
@@ -618,9 +618,9 @@ func (q *AsynqQueue) Enqueue(ctx context.Context, job *ScrapeJob) error {
     if err != nil {
         return fmt.Errorf("failed to marshal job: %w", err)
     }
-    
+
     task := asynq.NewTask(TypeScrapeJob, payload)
-    
+
     // Determine queue priority
     queue := "default"
     if job.Priority == "high" {
@@ -628,7 +628,7 @@ func (q *AsynqQueue) Enqueue(ctx context.Context, job *ScrapeJob) error {
     } else if job.Priority == "low" {
         queue = "low"
     }
-    
+
     info, err := q.client.EnqueueContext(
         ctx,
         task,
@@ -636,33 +636,33 @@ func (q *AsynqQueue) Enqueue(ctx context.Context, job *ScrapeJob) error {
         asynq.MaxRetry(3),
         asynq.Timeout(10*time.Minute),
     )
-    
+
     if err != nil {
         return fmt.Errorf("failed to enqueue task: %w", err)
     }
-    
+
     log.Info().
         Str("job_id", info.ID).
         Str("queue", queue).
         Str("scraper", job.ScraperName).
         Msg("Job enqueued successfully")
-    
+
     return nil
 }
 
 // RegisterHandler registers job handlers
 func (q *AsynqQueue) RegisterHandler(scraperManager *ScraperManager, processor *DataProcessor) {
     mux := asynq.NewServeMux()
-    
+
     mux.HandleFunc(TypeScrapeJob, func(ctx context.Context, task *asynq.Task) error {
         var job ScrapeJob
         if err := json.Unmarshal(task.Payload(), &job); err != nil {
             return fmt.Errorf("failed to unmarshal job: %w", err)
         }
-        
+
         return q.handleScrapeJob(ctx, &job, scraperManager, processor)
     })
-    
+
     if err := q.server.Run(mux); err != nil {
         log.Fatal().Err(err).Msg("Failed to start queue server")
     }
@@ -678,30 +678,30 @@ func (q *AsynqQueue) handleScrapeJob(
     log.Info().
         Str("scraper", job.ScraperName).
         Msg("Processing scrape job")
-    
+
     // Get scraper
     scraper, err := scraperManager.GetScraper(job.ScraperName)
     if err != nil {
         return fmt.Errorf("failed to get scraper: %w", err)
     }
-    
+
     // Execute scraping
     result, err := scraper.Scrape(ctx, job.Params)
     if err != nil {
         return fmt.Errorf("scraping failed: %w", err)
     }
-    
+
     // Process and store results
     if err := processor.Process(ctx, result); err != nil {
         return fmt.Errorf("processing failed: %w", err)
     }
-    
+
     log.Info().
         Str("scraper", job.ScraperName).
         Int("products", len(result.Products)).
         Int("prices", len(result.Prices)).
         Msg("Scrape job completed successfully")
-    
+
     return nil
 }
 ```
@@ -715,7 +715,7 @@ package processor
 import (
     "context"
     "fmt"
-    
+
     "github.com/rs/zerolog/log"
 )
 
@@ -742,42 +742,42 @@ func (p *DataProcessor) Process(ctx context.Context, result *ScrapeResult) error
     if err != nil {
         return fmt.Errorf("validation failed: %w", err)
     }
-    
+
     validPrices, err := p.validator.ValidatePrices(result.Prices)
     if err != nil {
         return fmt.Errorf("price validation failed: %w", err)
     }
-    
+
     log.Info().
         Int("total", len(result.Products)).
         Int("valid", len(validProducts)).
         Msg("Products validated")
-    
+
     // Step 2: Deduplicate data
     uniqueProducts, err := p.deduplicator.DeduplicateProducts(ctx, validProducts)
     if err != nil {
         return fmt.Errorf("deduplication failed: %w", err)
     }
-    
+
     // Step 3: Store in database
     if err := p.storage.SaveProducts(ctx, uniqueProducts); err != nil {
         return fmt.Errorf("failed to save products: %w", err)
     }
-    
+
     if err := p.storage.SavePrices(ctx, validPrices); err != nil {
         return fmt.Errorf("failed to save prices: %w", err)
     }
-    
+
     if err := p.storage.SavePromotions(ctx, result.Promotions); err != nil {
         return fmt.Errorf("failed to save promotions: %w", err)
     }
-    
+
     log.Info().
         Int("products", len(uniqueProducts)).
         Int("prices", len(validPrices)).
         Int("promotions", len(result.Promotions)).
         Msg("Data saved successfully")
-    
+
     return nil
 }
 ```
@@ -796,7 +796,7 @@ import (
     "context"
     "fmt"
     "time"
-    
+
     "github.com/cenkalti/backoff/v4"
     "github.com/rs/zerolog/log"
 )
@@ -814,7 +814,7 @@ func NewRetryableScraper(scraper Scraper, maxRetries int) *RetryableScraper {
     bo.InitialInterval = 5 * time.Second
     bo.MaxInterval = 30 * time.Second
     bo.MaxElapsedTime = 5 * time.Minute
-    
+
     return &RetryableScraper{
         scraper:    scraper,
         maxRetries: maxRetries,
@@ -826,7 +826,7 @@ func NewRetryableScraper(scraper Scraper, maxRetries int) *RetryableScraper {
 func (r *RetryableScraper) Scrape(ctx context.Context, params ScrapeParams) (*ScrapeResult, error) {
     var result *ScrapeResult
     var lastErr error
-    
+
     operation := func() error {
         var err error
         result, err = r.scraper.Scrape(ctx, params)
@@ -840,11 +840,11 @@ func (r *RetryableScraper) Scrape(ctx context.Context, params ScrapeParams) (*Sc
         }
         return nil
     }
-    
+
     if err := backoff.Retry(operation, r.backoff); err != nil {
         return nil, fmt.Errorf("scraping failed after %d retries: %w", r.maxRetries, lastErr)
     }
-    
+
     return result, nil
 }
 ```
@@ -858,7 +858,7 @@ package scraper
 import (
     "context"
     "fmt"
-    
+
     "github.com/sony/gobreaker"
 )
 
@@ -880,7 +880,7 @@ func NewCircuitBreakerScraper(scraper Scraper) *CircuitBreakerScraper {
             return counts.Requests >= 3 && failureRatio >= 0.6
         },
     }
-    
+
     return &CircuitBreakerScraper{
         scraper: scraper,
         cb:      gobreaker.NewCircuitBreaker(settings),
@@ -892,11 +892,11 @@ func (c *CircuitBreakerScraper) Scrape(ctx context.Context, params ScrapeParams)
     result, err := c.cb.Execute(func() (interface{}, error) {
         return c.scraper.Scrape(ctx, params)
     })
-    
+
     if err != nil {
         return nil, fmt.Errorf("circuit breaker: %w", err)
     }
-    
+
     return result.(*ScrapeResult), nil
 }
 ```
@@ -918,19 +918,19 @@ func (c *CircuitBreakerScraper) Scrape(ctx context.Context, params ScrapeParams)
 // Batch processing for database operations
 func (s *Storage) SaveProductsBatch(ctx context.Context, products []*Product) error {
     const batchSize = 100
-    
+
     for i := 0; i < len(products); i += batchSize {
         end := i + batchSize
         if end > len(products) {
             end = len(products)
         }
-        
+
         batch := products[i:end]
         if err := s.insertProductBatch(ctx, batch); err != nil {
             return err
         }
     }
-    
+
     return nil
 }
 ```
@@ -954,7 +954,7 @@ var (
         },
         []string{"scraper", "status"},
     )
-    
+
     ItemsScraped = promauto.NewCounterVec(
         prometheus.CounterOpts{
             Name: "scraper_items_total",
@@ -962,7 +962,7 @@ var (
         },
         []string{"scraper", "type"},
     )
-    
+
     ScrapingErrors = promauto.NewCounterVec(
         prometheus.CounterOpts{
             Name: "scraper_errors_total",
@@ -1082,7 +1082,7 @@ import (
     "os"
     "os/signal"
     "syscall"
-    
+
     "github.com/rs/zerolog/log"
     "precium/internal/config"
     "precium/internal/queue"
@@ -1096,17 +1096,17 @@ func main() {
     if err != nil {
         log.Fatal().Err(err).Msg("Failed to load configuration")
     }
-    
+
     // Initialize scrapers
     scraperManager := scraper.NewScraperManager()
-    
+
     // Register scrapers
     scraperManager.Register("walmart", scraper.NewWalmartScraper(configManager.GetConfig("walmart")))
     scraperManager.Register("target", scraper.NewTargetScraper(configManager.GetConfig("target")))
-    
+
     // Initialize job queue
     jobQueue := queue.NewAsynqQueue("redis:6379")
-    
+
     // Initialize scheduler
     scraperScheduler, err := scheduler.NewScraperScheduler(
         scraperManager.GetAll(),
@@ -1115,29 +1115,29 @@ func main() {
     if err != nil {
         log.Fatal().Err(err).Msg("Failed to create scheduler")
     }
-    
+
     // Schedule scrapers
     if err := scraperScheduler.ScheduleScrapers(configManager.GetEnabledScrapers()); err != nil {
         log.Fatal().Err(err).Msg("Failed to schedule scrapers")
     }
-    
+
     // Start scheduler
     scraperScheduler.Start()
     log.Info().Msg("Scraper service started")
-    
+
     // Wait for interrupt signal
     sigChan := make(chan os.Signal, 1)
     signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)
     <-sigChan
-    
+
     log.Info().Msg("Shutting down scraper service...")
     ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
     defer cancel()
-    
+
     if err := scraperScheduler.Stop(ctx); err != nil {
         log.Error().Err(err).Msg("Error during shutdown")
     }
-    
+
     log.Info().Msg("Scraper service stopped")
 }
 ```
@@ -1190,7 +1190,7 @@ func (s *ScraperService) HealthCheck(c *fiber.Ctx) error {
         "queue_size": s.queue.Size(),
         "uptime": time.Since(s.startTime).String(),
     }
-    
+
     return c.JSON(status)
 }
 ```

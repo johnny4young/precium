@@ -5,43 +5,56 @@ Welcome to the Precium project documentation! This index will help you navigate 
 ## 📖 Quick Navigation
 
 ### For Stakeholders & Decision Makers
+
 Start here for high-level overview and key decisions:
+
 - **[Executive Summary](00-EXECUTIVE-SUMMARY.md)** - Complete project overview, decisions, and next steps
 
 ### For Technical Leads & Architects
+
 Deep dive into technical decisions and architecture:
+
 - **[Technology Stack Analysis](01-TECHNOLOGY-STACK-ANALYSIS.md)** - Node.js vs Golang comparison
 - **[Monorepo Strategy](02-MONOREPO-VS-MULTIREPO-STRATEGY.md)** - Repository structure decisions
 - **[System Architecture](03-SYSTEM-ARCHITECTURE.md)** - Detailed system design
 - **[Architecture Diagrams](09-ARCHITECTURE-DIAGRAMS.md)** - Visual representations
 
 ### For Backend Developers
+
 Everything you need to build the API:
+
 - **[API Contracts](04-API-CONTRACTS.md)** - Complete API specifications
 - **[System Architecture](03-SYSTEM-ARCHITECTURE.md)** - Database schema and services
 - **[Development Guidelines](07-DEVELOPMENT-GUIDELINES.md)** - Coding standards
 
 ### For Frontend Developers
+
 For building web and mobile applications:
+
 - **[API Contracts](04-API-CONTRACTS.md)** - API endpoints to consume
 - **[Folder Structure](06-FOLDER-STRUCTURE-AND-BEST-PRACTICES.md)** - Component organization
 - **[Development Guidelines](07-DEVELOPMENT-GUIDELINES.md)** - React/React Native patterns
 
 ### For DevOps Engineers
+
 Infrastructure and deployment:
+
 - **[CI/CD Strategy](08-CI-CD-STRATEGY.md)** - Complete deployment pipeline
 - **[System Architecture](03-SYSTEM-ARCHITECTURE.md)** - Infrastructure requirements
 - **[Development Guidelines](07-DEVELOPMENT-GUIDELINES.md)** - Local setup
 - **[Supabase Deployment Guide](15-SUPABASE-DEPLOYMENT-GUIDE.md)** - Database deployment to Supabase
 
 ### For Project Managers
+
 Planning and timeline:
+
 - **[Implementation Roadmap](05-IMPLEMENTATION-ROADMAP.md)** - 6-iteration development plan
 - **[Executive Summary](00-EXECUTIVE-SUMMARY.md)** - Timeline and resource requirements
 
 ## 📚 Complete Documentation List
 
 ### Overview Documents
+
 1. **[00-EXECUTIVE-SUMMARY.md](00-EXECUTIVE-SUMMARY.md)** (~14,700 words) ✅ Updated
    - Project vision and goals
    - Key decisions summary (updated with SQLC, fuzzy search, monetization, Casbin)
@@ -64,6 +77,7 @@ Planning and timeline:
    - Code sharing patterns
 
 ### Technical Architecture
+
 4. **[03-SYSTEM-ARCHITECTURE.md](03-SYSTEM-ARCHITECTURE.md)** (~19,200 words) ✅ Updated
    - System components and services (Golang + Fiber)
    - Database schema with monetization tables
@@ -82,6 +96,7 @@ Planning and timeline:
    - Deployment architecture
 
 ### Planning & Process
+
 7. **[05-IMPLEMENTATION-ROADMAP.md](05-IMPLEMENTATION-ROADMAP.md)** (~18,900 words) ✅ Updated
    - 6-iteration development plan (24-30 weeks)
    - Week-by-week breakdown with Golang timeline
@@ -107,6 +122,7 @@ Planning and timeline:
     - Quality gates
 
 ### Special Analysis Documents
+
 11. **[10-API-COMMUNICATION-ANALYSIS.md](10-API-COMMUNICATION-ANALYSIS.md)** (~15,500 words) ✅ Complete
     - REST vs gRPC vs tRPC vs GraphQL
     - Protocol selection rationale (REST for client APIs)
@@ -187,16 +203,16 @@ Planning and timeline:
 
 All major technical decisions are documented and justified:
 
-| Decision | Chosen Option | Document |
-|----------|--------------|----------|
-| Backend Language | Golang 1.23+ | 01-TECHNOLOGY-STACK-DECISION |
-| HTTP Framework | Fiber v2.52+ | 13-GOLANG-HTTP-FRAMEWORK-COMPARISON |
-| Database | PostgreSQL 17 + PostGIS | 03-SYSTEM-ARCHITECTURE |
-| Query Builder | SQLC | 11-ADDITIONAL-REQUIREMENTS-ANALYSIS |
-| Authorization | Casbin (RBAC/ABAC) | 12-CASBIN-AUTHORIZATION-ANALYSIS |
-| Monorepo Tool | npm workspaces + Vite | 02-MONOREPO-VS-MULTIREPO-STRATEGY |
-| API Protocol | REST (client), gRPC (internal) | 10-API-COMMUNICATION-ANALYSIS |
-| Authentication | Custom Golang OAuth2 + JWT | 11-ADDITIONAL-REQUIREMENTS-ANALYSIS |
+| Decision         | Chosen Option                  | Document                            |
+| ---------------- | ------------------------------ | ----------------------------------- |
+| Backend Language | Golang 1.23+                   | 01-TECHNOLOGY-STACK-DECISION        |
+| HTTP Framework   | Fiber v2.52+                   | 13-GOLANG-HTTP-FRAMEWORK-COMPARISON |
+| Database         | PostgreSQL 17 + PostGIS        | 03-SYSTEM-ARCHITECTURE              |
+| Query Builder    | SQLC                           | 11-ADDITIONAL-REQUIREMENTS-ANALYSIS |
+| Authorization    | Casbin (RBAC/ABAC)             | 12-CASBIN-AUTHORIZATION-ANALYSIS    |
+| Monorepo Tool    | npm workspaces + Vite          | 02-MONOREPO-VS-MULTIREPO-STRATEGY   |
+| API Protocol     | REST (client), gRPC (internal) | 10-API-COMMUNICATION-ANALYSIS       |
+| Authentication   | Custom Golang OAuth2 + JWT     | 11-ADDITIONAL-REQUIREMENTS-ANALYSIS |
 
 ---
 
@@ -214,11 +230,13 @@ All major technical decisions are documented and justified:
 ## 🎯 Reading Paths
 
 ### Path 1: Quick Overview (30 minutes)
+
 1. Read: Executive Summary (15 min)
 2. Skim: Architecture Diagrams (10 min)
 3. Review: Implementation Roadmap - Iteration 1 only (5 min)
 
 ### Path 2: Technical Deep Dive (4-5 hours)
+
 1. Executive Summary (15 min)
 2. Technology Stack Decision + Framework Comparison (60 min)
 3. System Architecture (60 min)
@@ -228,9 +246,11 @@ All major technical decisions are documented and justified:
 7. CI/CD Strategy (30 min)
 
 ### Path 3: Implementation Ready (8-10 hours)
+
 Read all documents in order from 00 to 13.
 
 ### Path 4: Role-Specific
+
 Choose based on your role (see Quick Navigation above).
 
 ---
@@ -274,6 +294,7 @@ Choose based on your role (see Quick Navigation above).
 ## 📝 Document Maintenance
 
 ### Update Frequency
+
 - **Executive Summary**: After major decisions
 - **Technical Docs**: When architecture changes
 - **Implementation Roadmap**: End of each iteration
@@ -281,6 +302,7 @@ Choose based on your role (see Quick Navigation above).
 - **CI/CD Strategy**: When pipeline changes
 
 ### Version History
+
 - **v1.3** (2026-02-09): Added Framework Comparison (Fiber vs Echo vs Gin)
 - **v1.2** (2026-02-09): Added Casbin Authorization, Updated all docs for Golang
 - **v1.1** (2026-02-08): Added Additional Requirements Analysis
@@ -290,18 +312,22 @@ Choose based on your role (see Quick Navigation above).
 ## 🤝 Contributing to Documentation
 
 ### Reporting Issues
+
 If you find errors or have suggestions:
+
 1. Open an issue on GitHub
 2. Label it as `documentation`
 3. Reference the specific document and section
 
 ### Suggesting Improvements
+
 1. Fork the repository
 2. Make changes to documentation
 3. Submit pull request
 4. Request review from technical lead
 
 ### Documentation Standards
+
 - Clear, concise language
 - Examples for complex concepts
 - Diagrams where helpful
@@ -311,6 +337,7 @@ If you find errors or have suggestions:
 ## 🔗 External Resources
 
 ### External Technologies Referenced
+
 - [Go Documentation](https://go.dev/doc/)
 - [Fiber Framework](https://docs.gofiber.io/)
 - [SQLC Documentation](https://docs.sqlc.dev/)
@@ -322,6 +349,7 @@ If you find errors or have suggestions:
 - [GitHub Actions Documentation](https://docs.github.com/en/actions)
 
 ### Similar Projects (Inspiration)
+
 - Google Maps
 - Yelp
 - Honey (price tracking)
@@ -330,12 +358,15 @@ If you find errors or have suggestions:
 ## 📞 Support
 
 ### Questions?
+
 - **Technical Questions**: Open a GitHub issue with `question` label
 - **Architecture Discussions**: Create a discussion in GitHub Discussions
 - **Urgent Matters**: Contact the technical lead
 
 ### Feedback
+
 We welcome feedback on documentation quality:
+
 - Too technical? Too simple?
 - Missing information?
 - Confusing sections?
@@ -347,6 +378,7 @@ Please let us know so we can improve!
 Use this to verify documentation coverage:
 
 ### Planning Phase ✅
+
 - [x] Technology decisions documented
 - [x] Architecture defined
 - [x] API contracts specified
@@ -356,6 +388,7 @@ Use this to verify documentation coverage:
 - [x] Development guidelines written
 
 ### Implementation Phase (Future)
+
 - [ ] Setup guides tested
 - [ ] API documentation auto-generated
 - [ ] Component library documented
@@ -364,6 +397,7 @@ Use this to verify documentation coverage:
 - [ ] Video tutorials created (optional)
 
 ### Launch Phase (Future)
+
 - [ ] User documentation
 - [ ] Admin guides
 - [ ] API reference published
@@ -376,21 +410,25 @@ Use this to verify documentation coverage:
 ### For New Team Members
 
 **Week 1: Understanding the Project**
+
 - Day 1-2: Executive Summary + Architecture Diagrams
 - Day 3-4: System Architecture + API Contracts
 - Day 5: Development Guidelines setup
 
 **Week 2: Technical Deep Dive**
+
 - Day 1: Technology Stack Analysis
 - Day 2-3: Folder Structure + Best Practices
 - Day 4-5: Implementation Roadmap + CI/CD Strategy
 
 **Week 3: Hands-On**
+
 - Follow Development Guidelines
 - Set up local environment
 - Make first contribution
 
 ### Recommended Reading Order for Developers
+
 1. Executive Summary (overview)
 2. Development Guidelines (get started)
 3. Folder Structure (understand code organization)
@@ -401,12 +439,14 @@ Use this to verify documentation coverage:
 ## 🚀 Next Steps
 
 ### Immediate Actions
+
 1. ✅ Documentation complete
 2. 🔜 Get stakeholder approval
 3. 🔜 Assemble development team
 4. 🔜 Begin Iteration 1
 
 ### Using This Documentation
+
 - Bookmark this index for quick reference
 - Share specific docs based on role/need
 - Keep documentation open during development
@@ -420,7 +460,8 @@ Use this to verify documentation coverage:
 **Maintained By**: Technical Lead  
 **Next Review**: End of Iteration 1
 
-**Total Reading Time**: 
+**Total Reading Time**:
+
 - Quick Overview: ~30 minutes
 - Complete Read: ~15-20 hours
 - Reference Use: Ongoing

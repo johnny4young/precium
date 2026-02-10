@@ -1,0 +1,94 @@
+services:
+  # PostgreSQL with PostGIS extension
+  postgres:
+    image: postgis/postgis:17-3.4
+    container_name: precium-postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-precium}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-change_me_in_production}
+      POSTGRES_DB: ${POSTGRES_DB:-precium_dev}
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./apps/backend/db/init:/docker-entrypoint-initdb.d
+    healthcheck:
+      test:
+        [
+          'CMD-SHELL',
+          'pg_isready -U ${POSTGRES_USER:-precium} -d ${POSTGRES_DB:-precium_dev}',
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - precium-network
+
+  # Redis for caching
+  redis:
+    image: redis:7-alpine
+    container_name: precium-redis
+    ports:
+      - '6379:6379'
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - precium-network
+
+  # Backend API (Golang with Fiber)
+  backend:
+    build:
+      context: .
+      dockerfile: apps/backend/Dockerfile
+      target: development
+    container_name: precium-backend
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-precium}:${POSTGRES_PASSWORD:-change_me_in_production}@postgres:5432/${POSTGRES_DB:-precium_dev}?sslmode=disable
+      REDIS_URL: redis://redis:6379
+      PORT: 3001
+      ENV: development
+    ports:
+      - '3001:3001'
+    volumes:
+      - ./apps/backend:/app/apps/backend
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - precium-network
+    command: air -c .air.toml
+
+  # Web frontend (React + Vite)
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+      target: development
+    container_name: precium-web
+    environment:
+      VITE_API_URL: http://localhost:3001
+    ports:
+      - '3000:3000'
+    volumes:
+      - ./apps/web:/app/apps/web
+      - ./packages:/app/packages
+      - /app/node_modules
+      - /app/apps/web/node_modules
+    networks:
+      - precium-network
+    command: npm run dev
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  precium-network:
+    driver: bridge

@@ -399,6 +399,7 @@ precium/
 #### Backend (Golang)
 
 **Handler Pattern**:
+
 ```go
 // products/handler.go
 package products
@@ -420,14 +421,14 @@ func (h *Handler) GetAll(c *fiber.Ctx) error {
         Category: c.Query("category"),
         Brand:    c.Query("brand"),
     }
-    
+
     products, err := h.service.FindAll(c.Context(), filters)
     if err != nil {
         return c.Status(500).JSON(fiber.Map{
             "error": err.Error(),
         })
     }
-    
+
     return c.JSON(products)
 }
 
@@ -438,19 +439,20 @@ func (h *Handler) Create(c *fiber.Ctx) error {
             "error": "Invalid request body",
         })
     }
-    
+
     product, err := h.service.Create(c.Context(), dto)
     if err != nil {
         return c.Status(500).JSON(fiber.Map{
             "error": err.Error(),
         })
     }
-    
+
     return c.Status(201).JSON(product)
 }
 ```
 
 **Service Pattern**:
+
 ```go
 // products/service.go
 package products
@@ -488,6 +490,7 @@ func (s *Service) Create(ctx context.Context, dto CreateProductDTO) (sqlc.Produc
 #### Frontend (React)
 
 **Component Structure**:
+
 ```typescript
 // ProductCard.tsx
 import React from 'react';
@@ -507,8 +510,8 @@ export const ProductCard: React.FC<ProductCardProps> = ({
   };
 
   return (
-    <div 
-      className="product-card" 
+    <div
+      className="product-card"
       onClick={handleClick}
       role="button"
       tabIndex={0}
@@ -522,6 +525,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
 ```
 
 **Custom Hook Pattern**:
+
 ```typescript
 // useProducts.ts
 import { useQuery } from '@tanstack/react-query';
@@ -537,6 +541,7 @@ export const useProducts = (filters?: ProductFilters) => {
 ```
 
 **Page Component Pattern**:
+
 ```typescript
 // ProductsPage.tsx
 export const ProductsPage: React.FC = () => {
@@ -558,6 +563,7 @@ export const ProductsPage: React.FC = () => {
 ### Naming Conventions
 
 #### Files
+
 ```
 - Components: PascalCase (ProductCard.tsx)
 - Services: camelCase (products.service.ts)
@@ -567,6 +573,7 @@ export const ProductsPage: React.FC = () => {
 ```
 
 #### Code
+
 ```typescript
 // Classes & Interfaces: PascalCase
 class ProductService {}
@@ -636,6 +643,7 @@ function getUser(id: string): User | null {
 ### Testing Best Practices
 
 #### Unit Tests
+
 ```typescript
 // ProductCard.test.tsx
 import { render, screen, fireEvent } from '@testing-library/react';
@@ -656,7 +664,7 @@ describe('ProductCard', () => {
   it('calls onClick when clicked', () => {
     const onClick = jest.fn();
     render(<ProductCard product={mockProduct} onClick={onClick} />);
-    
+
     fireEvent.click(screen.getByRole('button'));
     expect(onClick).toHaveBeenCalledWith(mockProduct);
   });
@@ -664,6 +672,7 @@ describe('ProductCard', () => {
 ```
 
 #### Integration Tests
+
 ```typescript
 // products.service.spec.ts
 describe('ProductsService', () => {
@@ -682,9 +691,7 @@ describe('ProductsService', () => {
     }).compile();
 
     service = module.get<ProductsService>(ProductsService);
-    repository = module.get<Repository<Product>>(
-      getRepositoryToken(Product),
-    );
+    repository = module.get<Repository<Product>>(getRepositoryToken(Product));
   });
 
   it('should find all products', async () => {
@@ -710,11 +717,11 @@ class NotFoundError extends Error {
 // Error handling in services
 async function getProductById(id: string): Promise<Product> {
   const product = await productsRepository.findOne({ where: { id } });
-  
+
   if (!product) {
     throw new NotFoundError('Product', id);
   }
-  
+
   return product;
 }
 
@@ -728,12 +735,12 @@ import (
 func ErrorHandler(c *fiber.Ctx, err error) error {
     code := fiber.StatusInternalServerError
     message := "Internal server error"
-    
+
     if e, ok := err.(*fiber.Error); ok {
         code = e.Code
         message = e.Message
     }
-    
+
     return c.Status(code).JSON(fiber.Map{
         "error": fiber.Map{
             "statusCode": code,
@@ -819,12 +826,9 @@ const sortedProducts = useMemo(
 );
 
 // ✅ Use useCallback for callbacks passed to children
-const handleClick = useCallback(
-  (product) => {
-    console.log(product);
-  },
-  []
-);
+const handleClick = useCallback((product) => {
+  console.log(product);
+}, []);
 ```
 
 ### Git Workflow

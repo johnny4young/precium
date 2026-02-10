@@ -132,9 +132,11 @@ Precium is a location-based price comparison application that helps users find t
 ### Backend Services
 
 #### 1. Authentication Service
+
 **Responsibility**: User authentication and authorization
 
 **Features**:
+
 - OAuth2 integration (Google, Apple, GitHub)
 - JWT token generation and validation
 - Session management
@@ -142,6 +144,7 @@ Precium is a location-based price comparison application that helps users find t
 - Role-based access control (RBAC)
 
 **Technologies**:
+
 - **golang.org/x/oauth2** for OAuth2 flows
 - **golang-jwt/jwt** for JWT generation and validation
 - **golang.org/x/crypto/bcrypt** for password hashing
@@ -149,6 +152,7 @@ Precium is a location-based price comparison application that helps users find t
 - No Auth.js/NextAuth needed (frontend handles OAuth flow, backend validates tokens)
 
 **API Endpoints**:
+
 ```
 POST   /auth/register
 POST   /auth/login
@@ -162,9 +166,11 @@ GET    /auth/me
 ```
 
 #### 2. Search Service
+
 **Responsibility**: Location-based product and store search
 
 **Features**:
+
 - GPS coordinate-based queries
 - Configurable radius search
 - Product availability check
@@ -172,16 +178,18 @@ GET    /auth/me
 - Full-text search
 
 **Technologies**:
+
 - PostGIS for geographic queries
 - PostgreSQL full-text search
 - Redis for caching frequent searches
 
 **Key Algorithms**:
+
 ```go
 // Using SQLC-generated code for type-safe queries
 // queries/search.sql
 -- name: SearchStoresNearby :many
-SELECT s.*, 
+SELECT s.*,
        ST_Distance(
          ST_MakePoint(s.longitude, s.latitude)::geography,
          ST_MakePoint($1, $2)::geography
@@ -203,6 +211,7 @@ stores, err := queries.SearchStoresNearby(ctx, db.SearchStoresNearbyParams{
 ```
 
 **API Endpoints**:
+
 ```
 GET    /search/products?q=:query&lat=:lat&lon=:lon&radius=:radius
 GET    /search/stores?lat=:lat&lon=:lon&radius=:radius
@@ -210,20 +219,24 @@ GET    /search/products/:id/stores?lat=:lat&lon=:lon
 ```
 
 #### 3. Route Optimization Service
+
 **Responsibility**: Calculate optimal shopping routes
 
 **Features**:
+
 - Minimum distance route (Shortest path)
 - Best price route (Price optimization)
 - Multi-store visits
 - Real-time route updates
 
 **Technologies**:
+
 - Google Maps Directions API
 - Custom TSP (Traveling Salesman Problem) solver
 - Dijkstra's algorithm for pathfinding
 
 **Algorithm Approach**:
+
 ```typescript
 interface RouteOptimizationRequest {
   userLocation: Coordinates;
@@ -240,6 +253,7 @@ interface RouteOptimizationRequest {
 ```
 
 **API Endpoints**:
+
 ```
 POST   /routes/optimize
 GET    /routes/:id
@@ -247,15 +261,18 @@ GET    /routes/:id/navigation
 ```
 
 #### 4. Product Service
+
 **Responsibility**: Product catalog management
 
 **Features**:
+
 - Product CRUD operations
 - Product categorization
 - Barcode management
 - Product suggestions
 
 **API Endpoints**:
+
 ```
 GET    /products
 GET    /products/:id
@@ -266,15 +283,18 @@ GET    /products/search
 ```
 
 #### 5. Store Service
+
 **Responsibility**: Store information management
 
 **Features**:
+
 - Store CRUD operations
 - Operating hours
 - Store amenities
 - Store chain management
 
 **API Endpoints**:
+
 ```
 GET    /stores
 GET    /stores/:id
@@ -285,15 +305,18 @@ GET    /stores/:id/products
 ```
 
 #### 6. Price Service
+
 **Responsibility**: Price tracking and history
 
 **Features**:
+
 - Current price management
 - Price history tracking
 - Price alerts
 - Price trend analysis
 
 **API Endpoints**:
+
 ```
 GET    /prices/product/:productId/store/:storeId
 GET    /prices/product/:productId/history
@@ -303,9 +326,11 @@ GET    /prices/trends
 ```
 
 #### 7. OCR Service
+
 **Responsibility**: Receipt scanning and processing
 
 **Features**:
+
 - Image upload handling
 - OCR processing (Google Vision API)
 - Product/price extraction
@@ -313,6 +338,7 @@ GET    /prices/trends
 - Community contribution system
 
 **Flow**:
+
 ```
 1. User uploads receipt image
 2. Image stored in S3/GCS
@@ -325,6 +351,7 @@ GET    /prices/trends
 ```
 
 **API Endpoints**:
+
 ```
 POST   /ocr/upload
 GET    /ocr/jobs/:id
@@ -333,9 +360,11 @@ GET    /ocr/pending
 ```
 
 #### 8. Notification Service
+
 **Responsibility**: User notifications
 
 **Features**:
+
 - Push notifications (FCM/APNs)
 - Email notifications
 - In-app notifications
@@ -343,6 +372,7 @@ GET    /ocr/pending
 - Promotion notifications
 
 **API Endpoints**:
+
 ```
 POST   /notifications/subscribe
 POST   /notifications/send
@@ -355,6 +385,7 @@ PUT    /notifications/:id/read
 ### Core Tables
 
 #### Users
+
 ```sql
 CREATE TABLE users (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -373,6 +404,7 @@ CREATE INDEX idx_users_provider ON users(provider, provider_id);
 ```
 
 #### Stores
+
 ```sql
 CREATE TABLE stores (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -398,6 +430,7 @@ CREATE INDEX idx_stores_chain ON stores(chain_id);
 ```
 
 #### Products
+
 ```sql
 CREATE TABLE products (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -418,6 +451,7 @@ CREATE INDEX idx_products_barcode ON products(barcode);
 ```
 
 #### Prices
+
 ```sql
 CREATE TABLE prices (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -439,6 +473,7 @@ CREATE INDEX idx_prices_valid ON prices(valid_from, valid_until);
 ```
 
 #### Promotions
+
 ```sql
 CREATE TABLE promotions (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -461,6 +496,7 @@ CREATE INDEX idx_promotions_product ON promotions(product_id);
 ```
 
 #### Shopping Lists
+
 ```sql
 CREATE TABLE shopping_lists (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -504,6 +540,7 @@ CREATE INDEX idx_shopping_list_items_list ON shopping_list_items(list_id);
 ### Authorization
 
 **Role-Based Access Control (RBAC)**:
+
 - **User**: Normal user operations
 - **Admin**: Manage products, stores, prices
 - **Moderator**: Review OCR submissions
@@ -526,14 +563,14 @@ CREATE INDEX idx_shopping_list_items_list ON shopping_list_items(list_id);
 const cacheConfig = {
   // Hot data - 1 hour TTL
   searchResults: 3600,
-  
+
   // Warm data - 6 hours TTL
   productDetails: 21600,
   storeDetails: 21600,
-  
+
   // Cold data - 24 hours TTL
   promotions: 86400,
-  categories: 86400
+  categories: 86400,
 };
 ```
 
@@ -577,6 +614,7 @@ const cacheConfig = {
 ### Future Microservices
 
 When needed, extract services:
+
 1. Route Optimization → Golang service
 2. OCR Processing → Python/Golang service
 3. Search → Elasticsearch cluster
@@ -612,7 +650,7 @@ logger.info('Product searched', {
   query: searchQuery,
   location: { lat, lon },
   resultsCount: results.length,
-  responseTime: duration
+  responseTime: duration,
 });
 ```
 
@@ -626,21 +664,21 @@ logger.info('Product searched', {
 
 ## Technology Decisions Summary
 
-| Component | Technology | Rationale |
-|-----------|-----------|-----------|
-| Backend Language | Golang 1.23+ | Performance + Concurrency |
-| Backend Framework | Fiber 2.52+ | Fastest Go web framework |
-| Frontend Web | React + TypeScript | Industry standard |
-| Mobile | React Native | Code sharing |
-| Database | PostgreSQL 17 + PostGIS | Relational + GIS |
-| Query Builder | SQLC | Type-safe SQL generation |
-| Cache | Redis 7+ | Performance |
-| File Storage | AWS S3 / GCS | Scalability |
-| Authentication | golang.org/x/oauth2 + JWT | Native Golang OAuth2 |
-| Authorization | Casbin | Flexible RBAC/ABAC |
-| OCR | Google Vision API | Accuracy |
-| Maps | Google Maps API | Reliability |
-| Monitoring | Datadog | Comprehensive |
+| Component         | Technology                | Rationale                 |
+| ----------------- | ------------------------- | ------------------------- |
+| Backend Language  | Golang 1.23+              | Performance + Concurrency |
+| Backend Framework | Fiber 2.52+               | Fastest Go web framework  |
+| Frontend Web      | React + TypeScript        | Industry standard         |
+| Mobile            | React Native              | Code sharing              |
+| Database          | PostgreSQL 17 + PostGIS   | Relational + GIS          |
+| Query Builder     | SQLC                      | Type-safe SQL generation  |
+| Cache             | Redis 7+                  | Performance               |
+| File Storage      | AWS S3 / GCS              | Scalability               |
+| Authentication    | golang.org/x/oauth2 + JWT | Native Golang OAuth2      |
+| Authorization     | Casbin                    | Flexible RBAC/ABAC        |
+| OCR               | Google Vision API         | Accuracy                  |
+| Maps              | Google Maps API           | Reliability               |
+| Monitoring        | Datadog                   | Comprehensive             |
 
 ---
 
