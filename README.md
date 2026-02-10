@@ -65,10 +65,15 @@ npm install
 
 # Set up environment variables
 cp .env.example .env
-# Edit .env with your database credentials
+# Edit .env with your database credentials if needed
 
 # Start development environment with Docker
 docker-compose up -d
+
+# Wait for PostgreSQL to be ready, then run migrations
+cd apps/backend
+migrate -path db/migrations -database "postgresql://precium:precium_dev@localhost:5432/precium_dev?sslmode=disable" up
+cd ../..
 
 # Or run services individually:
 

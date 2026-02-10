@@ -80,12 +80,36 @@ sudo mv migrate /usr/local/bin/
 # Download from https://github.com/golang-migrate/migrate/releases
 ```
 
+**Important**: Before running migrations, ensure PostgreSQL is running and the database exists:
+
+```bash
+# Verify PostgreSQL is running
+docker-compose ps postgres
+
+# Check if database exists
+docker exec precium-postgres psql -U precium -d precium_dev -c "SELECT 1"
+```
+
+If the database doesn't exist, create it:
+
+```bash
+# If using Docker Compose, restart to create the database
+docker-compose down
+docker-compose up -d postgres
+
+# Or create manually
+docker exec precium-postgres psql -U precium -c "CREATE DATABASE precium_dev"
+```
+
 Run migrations:
 
 ```bash
 cd apps/backend
+# Make sure you're using the correct database name from your .env file
 migrate -path db/migrations -database "postgresql://precium:precium_dev@localhost:5432/precium_dev?sslmode=disable" up
 ```
+
+**Note**: Replace `precium_dev` with your actual password and database name if you changed them in `.env`.
 
 ## Running the Application
 
@@ -248,9 +272,53 @@ kill -9 <PID>
    ```
 
 3. Restart the service:
+
    ```bash
    docker-compose restart postgres
    ```
+
+### Database Migration Errors
+
+**Error: `database "precium" does not exist`**
+
+This error occurs when the database name in your migration command doesn't match the actual database. To fix:
+
+1. Check your `.env` file for the correct database name:
+
+   ```bash
+   cat .env | grep POSTGRES_DB
+   ```
+
+2. Verify the database exists in PostgreSQL:
+
+   ```bash
+   docker exec precium-postgres psql -U precium -l
+   ```
+
+3. If the database doesn't exist, create it:
+
+   ```bash
+   # Stop and recreate containers (this will create the database)
+   docker-compose down
+   docker-compose up -d postgres
+
+   # Or create manually
+   docker exec precium-postgres psql -U precium -c "CREATE DATABASE precium_dev"
+   ```
+
+4. Run migrations with the correct database name:
+
+   ```bash
+   cd apps/backend
+   # Use the database name from your .env file (default: precium_dev)
+   migrate -path db/migrations -database "postgresql://precium:precium_dev@localhost:5432/precium_dev?sslmode=disable" up
+   ```
+
+**Common causes:**
+
+- `.env` file not created from `.env.example`
+- Database name mismatch between `.env` and migration command
+- PostgreSQL container not initialized properly
 
 ### Node Module Issues
 
